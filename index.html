@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BaoBao</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <div id="baobao-container" data-tauri-drag-region>
+      <div id="island" class="collapsed" data-tauri-drag-region>
+        <!-- Top Bar / Pill Header -->
+        <div class="island-header" data-tauri-drag-region>
+          <div class="header-left" data-tauri-drag-region>
+            <!-- Cute Baobao Dumpling Mascot Logo -->
+            <div class="baobao-logo" data-tauri-drag-region title="Baobao">
+              <svg class="baobao-dumpling-svg" viewBox="0 0 32 30" width="24" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="dumpling-body" d="M16 2.4 C14.7 2.4 13.9 3.8 12.8 4.4 C11.4 5.1 9.6 5.0 8.4 6.2 C5.8 8.4 2.8 12.2 2.8 16.5 C2.8 23.2 8.6 28 16 28 C23.4 28 29.2 23.2 29.2 16.5 C29.2 12.2 26.2 8.4 23.6 6.2 C22.4 5.0 20.6 5.1 19.2 4.4 C18.1 3.8 17.3 2.4 16 2.4 Z" fill="currentColor" />
+                <path class="dumpling-crease" d="M16 5.5 V9.2 M12.6 6.6 L10.6 9.8 M19.4 6.6 L21.4 9.8" stroke="rgba(255, 255, 255, 0.5)" stroke-width="1.3" stroke-linecap="round" />
+              </svg>
+              <div class="baobao-avatar" data-tauri-drag-region>
+                <span class="baobao-eye left"></span>
+                <span class="baobao-eye right"></span>
+              </div>
+            </div>
+            <span id="header-category" class="header-category"></span>
+          </div>
+
+          <div class="header-center" data-tauri-drag-region>
+            <span class="pill-clock">21:20</span>
+            <div id="pill-lyrics-container" class="pill-lyrics-container" style="display: none;" data-tauri-drag-region>
+              <span id="pill-lyric-text" class="pill-lyric-text">In My Blood</span>
+            </div>
+            <span id="full-datetime" class="full-datetime">Fri 23 Oct 2026 <strong>21:20</strong></span>
+          </div>
+
+          <div class="header-right" data-tauri-drag-region>
+            <div class="sound-wave paused" title="Audio Visualizer">
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+            </div>
+            <!-- Pin Island Toggle (Keep Expanded) -->
+            <button id="btn-pin-island" class="btn-pin-header" title="Keep Island Expanded (Sematkan Selalu Terbuka)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="17" x2="12" y2="22"></line>
+                <path d="M5 17h14v-2l-2-3V5a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v7l-2 3v2z"></path>
+              </svg>
+            </button>
+            <button id="btn-open-settings" class="btn-settings-header" title="Pengaturan (Settings)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Body Content (Folds open smoothly when expanded!) -->
+        <div class="island-body" data-tauri-drag-region>
+          <!-- Left Arrow -->
+          <button id="btn-prev-slide" class="nav-arrow left-arrow" title="Previous view">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <!-- Slides Viewport -->
+          <div class="slides-wrapper" data-tauri-drag-region>
+            <!-- Slide 1: Music Player -->
+            <div id="slide-music" class="slide active" data-tauri-drag-region>
+              <!-- Active Music Layout -->
+              <div id="music-active-view" class="music-layout" data-tauri-drag-region>
+                <!-- Album Art -->
+                <div class="album-art-wrapper" data-tauri-drag-region>
+                  <img id="album-cover-img" src="" alt="Album Art" class="album-cover" />
+                  <div id="album-cover-fallback" class="album-cover fallback">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M9 18V5l12-2v13"></path>
+                      <circle cx="6" cy="18" r="3"></circle>
+                      <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Track Info & Controls -->
+                <div class="player-content" data-tauri-drag-region>
+                  <div class="track-meta" data-tauri-drag-region>
+                    <h4 id="track-title" class="track-title">In My Blood</h4>
+                    <p id="track-artist" class="track-artist">Shawn Mendes - Shawn Mendes</p>
+                  </div>
+
+                  <div class="progress-container" data-tauri-drag-region>
+                    <span id="time-current" class="time-label">02:38</span>
+                    <div id="progress-bar-track" class="progress-bar-track">
+                      <div id="progress-bar-fill" class="progress-bar-fill" style="width: 72%;"></div>
+                    </div>
+                    <span id="time-remaining" class="time-label">-00:53</span>
+                  </div>
+
+                  <div class="controls-row">
+                    <button id="btn-lyrics" class="ctrl-btn icon-btn" title="Toggle Lyrics">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        <line x1="8" y1="9" x2="16" y2="9"></line>
+                        <line x1="8" y1="13" x2="14" y2="13"></line>
+                      </svg>
+                    </button>
+
+                    <div class="playback-controls">
+                      <button id="btn-prev" class="ctrl-btn" title="Previous Track">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                          <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line>
+                        </svg>
+                      </button>
+                      <button id="btn-play-pause" class="ctrl-btn play-btn" title="Play/Pause">
+                        <svg id="icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                          <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+                          <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+                        </svg>
+                        <svg id="icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                      </button>
+                      <button id="btn-next" class="ctrl-btn" title="Next Track">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                          <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line>
+                        </svg>
+                      </button>
+
+                      <!-- Integrated Master Volume Control -->
+                      <div class="volume-slider-group" id="volume-group" title="Volume (Scroll mouse to adjust)">
+                        <button id="btn-volume-mute" class="ctrl-btn" title="Mute/Unmute">
+                          <svg id="icon-vol-high" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                          </svg>
+                          <svg id="icon-vol-low" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                          </svg>
+                          <svg id="icon-vol-muted" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <line x1="23" y1="9" x2="17" y2="15"></line>
+                            <line x1="17" y1="9" x2="23" y2="15"></line>
+                          </svg>
+                        </button>
+                        <div id="volume-slider-track" class="volume-slider-track">
+                          <div id="volume-slider-fill" class="volume-slider-fill" style="width: 70%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Realtime Synced Lyrics Pane -->
+                <div id="lyrics-pane" class="lyrics-pane hidden" data-tauri-drag-region>
+                  <div class="lyrics-content" data-tauri-drag-region>
+                    <p id="lyric-prev" class="lyric-line muted">...</p>
+                    <p id="lyric-active" class="lyric-line active">Loading lyrics...</p>
+                    <p id="lyric-next" class="lyric-line muted">...</p>
+                    <button id="btn-full-lyrics" class="btn-full-lyrics" title="Full lyrics">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="22"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Idle Music Waiting State (Shown when idle 3+ min) -->
+              <div id="music-idle-view" class="music-idle-layout" style="display: none;" data-tauri-drag-region>
+                <div class="idle-mascot-box" data-tauri-drag-region>
+                  <div class="idle-dumpling-mascot">
+                    <svg class="idle-dumpling-svg" viewBox="0 0 32 30" width="56" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path class="dumpling-body" d="M16 2.4 C14.7 2.4 13.9 3.8 12.8 4.4 C11.4 5.1 9.6 5.0 8.4 6.2 C5.8 8.4 2.8 12.2 2.8 16.5 C2.8 23.2 8.6 28 16 28 C23.4 28 29.2 23.2 29.2 16.5 C29.2 12.2 26.2 8.4 23.6 6.2 C22.4 5.0 20.6 5.1 19.2 4.4 C18.1 3.8 17.3 2.4 16 2.4 Z" fill="currentColor" />
+                      <path class="dumpling-crease" d="M16 5.5 V9.2 M12.6 6.6 L10.6 9.8 M19.4 6.6 L21.4 9.8" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.3" stroke-linecap="round" />
+                    </svg>
+                    <div class="idle-sleepy-face">
+                      <span class="idle-sleepy-eye left"></span>
+                      <span class="idle-sleepy-eye right"></span>
+                    </div>
+                  </div>
+                  <div class="idle-zzz-cloud">
+                    <span class="zzz z1">z</span>
+                    <span class="zzz z2">z</span>
+                    <span class="zzz z3">Z</span>
+                  </div>
+                </div>
+                <div class="idle-info-box" data-tauri-drag-region>
+                  <h4 class="idle-headline">Waiting for music...</h4>
+                  <p class="idle-caption">Play any song to start listening</p>
+                </div>
+              </div>
+
+              <!-- Dedicated In-Island Full Lyrics Mode -->
+              <div id="music-full-lyrics-view" class="music-full-lyrics-layout" style="display: none;" data-tauri-drag-region>
+                <div class="full-lyrics-topbar" data-tauri-drag-region>
+                  <div class="full-lyrics-track-pill" data-tauri-drag-region>
+                    <span id="full-now-title" class="full-now-title">In My Blood</span>
+                    <span class="full-dot">-</span>
+                    <span id="full-now-artist" class="full-now-artist">Shawn Mendes</span>
+                  </div>
+                  <button id="btn-exit-full-lyrics" class="btn-exit-full-lyrics" title="Tutup lirik">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+
+                <div id="full-lyrics-stream" class="full-lyrics-stream">
+                  <!-- Synced lyrics populated dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 2: Shelf (Desktop Icon Stash & Launcher) -->
+            <div id="slide-shelf" class="slide" data-tauri-drag-region>
+              <div id="shelf-drop-zone" class="shelf-zone" data-tauri-drag-region>
+                <!-- Empty Placeholder -->
+                <div id="shelf-empty-state" class="shelf-empty-state" data-tauri-drag-region>
+                  <div class="drop-tray-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                      <path d="M20 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"></path>
+                      <path d="M4 14h5l2 3h2l2-3h5"></path>
+                    </svg>
+                  </div>
+                  <h4 id="shelf-drop-title" class="drop-title">Drop files here</h4>
+                  <p id="shelf-drop-subtitle" class="drop-subtitle">Drag files / folders / apps to stash</p>
+                </div>
+
+                <!-- View Mode Switch: Slider vs Grid & Clear All -->
+                <div id="shelf-view-toggle" class="shelf-view-toggle-bar" style="display: none;" data-tauri-drag-region>
+                  <button id="btn-shelf-clear-all" class="shelf-view-btn shelf-clear-btn" title="Clear all items (Hapus Semua)">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                  <div class="shelf-toggle-sep"></div>
+                  <button id="btn-shelf-slider" class="shelf-view-btn active" title="Slider View (Scroll kesamping)">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                      <circle cx="8" cy="12" r="2" fill="currentColor"></circle>
+                    </svg>
+                  </button>
+                  <button id="btn-shelf-grid" class="shelf-view-btn" title="Grid View (Grid kebawah)">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                      <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                      <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                      <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Grid of Desktop Items (Populated dynamically) -->
+                <div id="shelf-items-grid" class="shelf-items-grid mode-slider" style="display: none;" data-tauri-drag-region>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 2: Notes Tab (Catatan) -->
+            <div id="slide-notes" class="slide" data-tauri-drag-region>
+              <div id="notes-container" class="notes-container no-editor" data-tauri-drag-region>
+                <!-- Left: Notes List & Quick New -->
+                <div class="notes-sidebar" data-tauri-drag-region>
+                  <div class="notes-sidebar-header" data-tauri-drag-region>
+                    <span id="txt-notes-count" class="notes-count">0 Notes</span>
+                    <button id="btn-add-note" class="btn-notes-add" title="New Note">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                      <span id="txt-btn-new-note">New</span>
+                    </button>
+                  </div>
+                  <div id="notes-list" class="notes-list">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+
+                <!-- Right: Note Editor -->
+                <div id="notes-editor" class="notes-editor" style="display: none;" data-tauri-drag-region>
+                  <div class="notes-editor-header" data-tauri-drag-region>
+                    <button id="btn-back-to-notes" class="btn-note-header-action btn-back-note" title="Kembali ke Daftar">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                      </svg>
+                    </button>
+                    <input type="text" id="note-title-input" class="note-title-input" placeholder="Title..." maxlength="60" />
+                    <div class="notes-editor-actions" data-tauri-drag-region>
+                      <button id="btn-toggle-complete" class="btn-note-header-action" title="Tandai Selesai">
+                        <svg id="icon-note-incomplete" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"></circle></svg>
+                        <svg id="icon-note-completed" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" style="display: none;"><circle cx="12" cy="12" r="9" fill="rgba(16, 185, 129, 0.2)"></circle><polyline points="8 12 11 15 16 9"></polyline></svg>
+                      </button>
+                      <button id="btn-delete-note" class="btn-note-del" title="Delete Note">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                      <button id="btn-close-note" class="btn-note-header-action btn-close-editor" title="Tutup Editor">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <textarea id="note-body-input" class="note-body-input" placeholder="Write details here..."></textarea>
+
+                  <div class="notes-editor-footer" data-tauri-drag-region>
+                    <div class="note-dates-group" data-tauri-drag-region>
+                      <!-- Created Date (Readonly / Disabled) -->
+                      <div class="note-date-chip readonly" id="chip-created-date" title="Tanggal Dibuat">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span id="note-created-display" class="note-chip-text">--</span>
+                      </div>
+
+                      <!-- Optional Deadline / Due Date (Calendar Popup Picker) -->
+                      <div class="note-date-chip due clickable" id="chip-due-date" title="Tenggat Waktu (Klik untuk pilih kalender)">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span id="note-due-display" class="note-chip-text">Tanpa tenggat</span>
+                        <input type="date" id="note-due-picker" class="hidden-date-picker" />
+                        <button id="btn-clear-due" class="btn-chip-clear" style="display: none;" title="Hapus tenggat">
+                          <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <button id="btn-save-note" class="btn-note-save" title="Save Note">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      <span id="txt-btn-save-note">Save</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3: Settings (Pengaturan) -->
+            <div id="slide-settings" class="slide" data-tauri-drag-region>
+              <div class="settings-container" data-tauri-drag-region>
+                <!-- Left: Toggles & Language Dropdown -->
+                <div class="settings-col" data-tauri-drag-region>
+                  <div class="settings-item" data-tauri-drag-region>
+                    <div class="settings-meta">
+                      <div class="settings-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                        </svg>
+                      </div>
+                      <div class="settings-texts">
+                        <span id="txt-sfx-label" class="settings-label">Sound Effects</span>
+                        <span id="txt-sfx-desc" class="settings-desc">UI click audio</span>
+                      </div>
+                    </div>
+                    <label class="toggle-switch" title="Toggle SFX">
+                      <input type="checkbox" id="toggle-sfx" checked />
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+
+                  <div class="settings-item" data-tauri-drag-region>
+                    <div class="settings-meta">
+                      <div class="settings-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M9 18V5l12-2v13"></path>
+                          <circle cx="6" cy="18" r="3"></circle>
+                          <circle cx="18" cy="16" r="3"></circle>
+                        </svg>
+                      </div>
+                      <div class="settings-texts">
+                        <span id="txt-lyrics-label" class="settings-label">Mini Pill Lyrics</span>
+                        <span id="txt-lyrics-desc" class="settings-desc">Show when minimized</span>
+                      </div>
+                    </div>
+                    <label class="toggle-switch" title="Toggle mini lyrics">
+                      <input type="checkbox" id="toggle-mini-lyrics" checked />
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+
+                  <div class="settings-item settings-item-compact" data-tauri-drag-region>
+                    <div class="settings-meta">
+                      <div class="settings-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="2" y1="12" x2="22" y2="12"></line>
+                          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                      </div>
+                      <div class="settings-texts">
+                        <span id="txt-lang-label" class="settings-label">Language</span>
+                        <span id="txt-lang-desc" class="settings-desc">Display language</span>
+                      </div>
+                    </div>
+                    <div class="custom-select-wrapper">
+                      <select id="select-language" class="settings-select">
+                        <option value="en" selected>English</option>
+                        <option value="id">Indonesia</option>
+                        <option value="ja">日本語</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Start on Boot under Language -->
+                  <div class="settings-item" data-tauri-drag-region>
+                    <div class="settings-meta">
+                      <div class="settings-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                          <line x1="12" y1="2" x2="12" y2="12"></line>
+                        </svg>
+                      </div>
+                      <div class="settings-texts">
+                        <span id="txt-autostart-label" class="settings-label">Start on Boot</span>
+                        <span id="txt-autostart-desc" class="settings-desc">Launch on PC startup</span>
+                      </div>
+                    </div>
+                    <label class="toggle-switch" title="Launch automatically on Windows startup">
+                      <input type="checkbox" id="toggle-autostart" checked />
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="settings-divider"></div>
+
+                <!-- Right: Theme Picker (No theme name badge) -->
+                <div class="settings-col settings-theme-col" data-tauri-drag-region>
+                  <div class="theme-header">
+                    <span id="txt-theme-label" class="settings-label">Color Theme</span>
+                  </div>
+                  <div class="theme-swatches-grid">
+                    <button class="theme-swatch active" data-theme="gray" title="Slate Gray" style="--swatch-gradient: linear-gradient(135deg, #e4e4e7, #a1a1aa, #71717a);">
+                      <span class="swatch-color"></span>
+                    </button>
+                    <button class="theme-swatch" data-theme="pink" title="Sakura Pink" style="--swatch-gradient: linear-gradient(135deg, #ff758c, #ff7eb3, #f43f5e);">
+                      <span class="swatch-color"></span>
+                    </button>
+                    <button class="theme-swatch" data-theme="cyan" title="Neon Cyan" style="--swatch-gradient: linear-gradient(135deg, #0ea5e9, #06b6d4, #3b82f6);">
+                      <span class="swatch-color"></span>
+                    </button>
+                    <button class="theme-swatch" data-theme="emerald" title="Emerald Green" style="--swatch-gradient: linear-gradient(135deg, #10b981, #059669, #34d399);">
+                      <span class="swatch-color"></span>
+                    </button>
+                    <button class="theme-swatch" data-theme="sunset" title="Sunset Amber" style="--swatch-gradient: linear-gradient(135deg, #f97316, #ef4444, #f43f5e);">
+                      <span class="swatch-color"></span>
+                    </button>
+                    <button class="theme-swatch" data-theme="gold" title="Solar Gold" style="--swatch-gradient: linear-gradient(135deg, #f59e0b, #eab308, #fbbf24);">
+                      <span class="swatch-color"></span>
+                    </button>
+                  </div>
+                  <div class="settings-footer-info">
+                    <span id="txt-app-footer">BaoBao v0.1.0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Arrow -->
+          <button id="btn-next-slide" class="nav-arrow right-arrow" title="Next view">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Carousel Dots -->
+        <div class="carousel-dots" data-tauri-drag-region>
+          <span class="dot active" data-index="0" title="Music"></span>
+          <span class="dot" data-index="1" title="Shelf"></span>
+          <span class="dot" data-index="2" title="Notes"></span>
+          <span class="dot" data-index="3" title="Settings"></span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
