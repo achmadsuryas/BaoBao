@@ -1720,6 +1720,28 @@ html, body {
   color: #ffffff;
 }
 
+.btn-setting-action {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-setting-action:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: var(--theme-accent);
+  color: var(--theme-accent);
+}
+
 .theme-swatches-grid {
   display: flex;
   align-items: center;

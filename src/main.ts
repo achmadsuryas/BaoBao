@@ -262,6 +262,8 @@ const I18N: Record<Lang, Record<string, string>> = {
     loadingLyrics: "Loading lyrics...",
     autostartTitle: "Start on Boot",
     autostartDesc: "Launch on PC startup",
+    monitorTitle: "Display Monitor",
+    monitorDesc: "Switch screen",
     langDesc: "Display language",
     appFooter: "BaoBao v0.1.0",
     settingsCategory: "Settings",
@@ -321,6 +323,8 @@ const I18N: Record<Lang, Record<string, string>> = {
     loadingLyrics: "Memuat lirik...",
     autostartTitle: "Mulai Otomatis",
     autostartDesc: "Buka saat laptop/PC menyala",
+    monitorTitle: "Layar / Monitor",
+    monitorDesc: "Ganti monitor",
     langDesc: "Bahasa tampilan",
     appFooter: "BaoBao v0.1.0",
     settingsCategory: "Pengaturan",
@@ -380,6 +384,8 @@ const I18N: Record<Lang, Record<string, string>> = {
     loadingLyrics: "歌詞を読み込み中...",
     autostartTitle: "自動起動",
     autostartDesc: "PC起動時に自動で開始",
+    monitorTitle: "ディスプレイ",
+    monitorDesc: "画面切り替え",
     langDesc: "表示言語",
     appFooter: "BaoBao v0.1.0",
     settingsCategory: "設定",
@@ -498,6 +504,11 @@ function applyLanguage(lang: Lang): void {
   if (autostartLabel) autostartLabel.textContent = dict.autostartTitle;
   const autostartDesc = document.getElementById("txt-autostart-desc");
   if (autostartDesc) autostartDesc.textContent = dict.autostartDesc;
+
+  const monitorLabel = document.getElementById("txt-monitor-label");
+  if (monitorLabel) monitorLabel.textContent = dict.monitorTitle;
+  const monitorDesc = document.getElementById("txt-monitor-desc");
+  if (monitorDesc) monitorDesc.textContent = dict.monitorDesc;
 
   const shelfDropTitle = document.getElementById("shelf-drop-title");
   if (shelfDropTitle) shelfDropTitle.textContent = dict.shelfDropTitle;
@@ -1850,6 +1861,50 @@ function setSlide(index: number): void {
 // ============================================
 
 window.addEventListener("DOMContentLoaded", async () => {
+  // --- Multi-Monitor Setup ---
+  invoke<number>("get_monitors_count")
+    .then(async (count) => {
+      const monitorItem = document.getElementById("settings-item-monitor");
+      if (!monitorItem) return;
+      const currentLabel = await invoke<string>("get_current_monitor_label").catch(() => "Monitor 1");
+      const txt = document.getElementById("txt-current-monitor");
+      if (txt) {
+        txt.textContent = count > 1 ? `${currentLabel} ⇄` : currentLabel;
+      }
+      const btn = document.getElementById("btn-switch-monitor");
+      if (btn && count <= 1) {
+        btn.title = "1 Layar aktif (Klik untuk merapikan ke posisi tengah atas)";
+      }
+    })
+    .catch(() => {});
+
+  // 1-Click Monitor Switcher button
+  const btnSwitchMonitor = document.getElementById("btn-switch-monitor");
+  btnSwitchMonitor?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    sfx.playPop();
+    try {
+      const res = await invoke<string>("switch_monitor");
+      const count = await invoke<number>("get_monitors_count").catch(() => 1);
+      const lbl = document.getElementById("txt-current-monitor");
+      if (lbl && res) {
+        lbl.textContent = count > 1 ? `${res} ⇄` : res;
+      }
+    } catch (err) {
+      console.error("switch_monitor error:", err);
+    }
+  });
+
+  // Dedicated wheel listener on left settings container so wheel scrolls list, NOT tab switch
+  const settingsLeftCol = document.querySelector(".settings-col");
+  settingsLeftCol?.addEventListener(
+    "wheel",
+    (e) => {
+      e.stopPropagation();
+    },
+    { passive: true }
+  );
+
   window.addEventListener("contextmenu", (e) => e.preventDefault());
 
   // --- Normal Island Window Mode ---

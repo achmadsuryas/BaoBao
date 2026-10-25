@@ -953,6 +953,105 @@ fn start_cursor_hit_test(window: tauri::WebviewWindow) {
 fn start_cursor_hit_test(_window: tauri::WebviewWindow) {}
 
 // ============================================
+// Multi-Monitor Support
+// ============================================
+
+/// Returns the total number of connected monitors.
+#[tauri::command]
+fn get_monitors_count(app: AppHandle) -> Result<usize, String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+    let monitors = window.available_monitors().map_err(|e| e.to_string())?;
+    Ok(monitors.len())
+}
+
+/// Returns the label of the monitor BaoBao is currently on (e.g. "Monitor 1")
+#[tauri::command]
+fn get_current_monitor_label(app: AppHandle) -> Result<String, String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+    let monitors = window.available_monitors().map_err(|e| e.to_string())?;
+    let win_pos = window.outer_position().map_err(|e| e.to_string())?;
+    let win_size = window.outer_size().map_err(|e| e.to_string())?;
+    let center_x = win_pos.x + (win_size.width as i32 / 2);
+
+    let current_idx = monitors.iter().position(|m| {
+        let m_x = m.position().x;
+        let m_w = m.size().width as i32;
+        center_x >= m_x && center_x < (m_x + m_w)
+    }).unwrap_or(0);
+
+    Ok(format!("Monitor {}", current_idx + 1))
+}
+
+/// Switches BaoBao directly to the next monitor and locks it at top-center.
+#[tauri::command]
+fn switch_monitor(app: AppHandle) -> Result<String, String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+
+    let monitors = window.available_monitors().map_err(|e| e.to_string())?;
+    if monitors.is_empty() {
+        return Err("No monitors detected".to_string());
+    }
+
+    let win_pos = window.outer_position().map_err(|e| e.to_string())?;
+    let win_size = window.outer_size().map_err(|e| e.to_string())?;
+    let center_x = win_pos.x + (win_size.width as i32 / 2);
+
+    let current_idx = monitors.iter().position(|m| {
+        let m_x = m.position().x;
+        let m_w = m.size().width as i32;
+        center_x >= m_x && center_x < (m_x + m_w)
+    }).unwrap_or(0);
+
+    let next_idx = (current_idx + 1) % monitors.len();
+    let target_monitor = &monitors[next_idx];
+
+    let monitor_size = target_monitor.size();
+    let monitor_position = target_monitor.position();
+
+    let x = monitor_position.x + ((monitor_size.width as i32 - win_size.width as i32) / 2);
+    let y = monitor_position.y;
+
+    #[cfg(windows)]
+    {
+        if let Ok(hwnd_val) = window.hwnd() {
+            unsafe extern "system" {
+                fn SetWindowPos(
+                    hwnd: *mut std::ffi::c_void,
+                    hwnd_insert_after: *mut std::ffi::c_void,
+                    x: i32,
+                    y: i32,
+                    cx: i32,
+                    cy: i32,
+                    flags: u32,
+                ) -> i32;
+            }
+            let raw_ptr = hwnd_val.0 as *mut std::ffi::c_void;
+            unsafe {
+                SetWindowPos(
+                    raw_ptr,
+                    std::ptr::null_mut(),
+                    x,
+                    y,
+                    win_size.width as i32,
+                    win_size.height as i32,
+                    0x0314, // SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED
+                );
+            }
+            return Ok(format!("Monitor {}", next_idx + 1));
+        }
+    }
+
+    window.set_position(PhysicalPosition::new(x, y)).map_err(|e| e.to_string())?;
+    Ok(format!("Monitor {}", next_idx + 1))
+}
+
+// ============================================
 // App Entry Point
 // ============================================
 
@@ -974,7 +1073,10 @@ pub fn run() {
             open_file_path,
             get_file_icon,
             set_autostart,
-            get_autostart
+            get_autostart,
+            switch_monitor,
+            get_monitors_count,
+            get_current_monitor_label
         ])
         .setup(|app| {
             println!("[Baobao] Setup starting...");
