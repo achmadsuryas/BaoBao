@@ -42,8 +42,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'BaoBao ${{ github.ref_name }}'
+          tagName: v__VERSION__
+          releaseName: 'BaoBao v__VERSION__'
           releaseBody: 'Lihat release notes dan file installer untuk Windows (.exe, .msi) dan macOS (.dmg, .app).'
           releaseDraft: false
           prerelease: false
