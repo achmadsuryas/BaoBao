@@ -175,99 +175,28 @@
                 </div>
               </div>
 
-              <!-- Idle Music & Tamagotchi Pet Companion State -->
+              <!-- Idle Music Waiting State (Shown when idle 3+ min) -->
               <div id="music-idle-view" class="music-idle-layout" style="display: none;" data-tauri-drag-region>
-                <!-- Interactive Tamagotchi BaoBao Mascot -->
-                <div class="idle-mascot-box" id="pet-mascot-box" title="Klik untuk mengelus BaoBao! ❤️" data-tauri-drag-region>
-                  <!-- Speech / Expression Bubble -->
-                  <div id="pet-dialog-bubble" class="pet-dialog-bubble">
-                    <span id="pet-dialog-text">Halo! Aku BaoBao 🥟</span>
-                  </div>
-
-                  <div id="pet-mascot" class="idle-dumpling-mascot pet-interactive">
-                    <svg class="idle-dumpling-svg" viewBox="0 0 32 30" width="60" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div class="idle-mascot-box" data-tauri-drag-region>
+                  <div class="idle-dumpling-mascot">
+                    <svg class="idle-dumpling-svg" viewBox="0 0 32 30" width="56" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path class="dumpling-body" d="M16 2.4 C14.7 2.4 13.9 3.8 12.8 4.4 C11.4 5.1 9.6 5.0 8.4 6.2 C5.8 8.4 2.8 12.2 2.8 16.5 C2.8 23.2 8.6 28 16 28 C23.4 28 29.2 23.2 29.2 16.5 C29.2 12.2 26.2 8.4 23.6 6.2 C22.4 5.0 20.6 5.1 19.2 4.4 C18.1 3.8 17.3 2.4 16 2.4 Z" fill="currentColor" />
                       <path class="dumpling-crease" d="M16 5.5 V9.2 M12.6 6.6 L10.6 9.8 M19.4 6.6 L21.4 9.8" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.3" stroke-linecap="round" />
                     </svg>
-
-                    <!-- Dynamic Faces: Normal / Happy / Sleepy / Eating / Starry -->
-                    <div id="pet-face" class="idle-pet-face mood-happy">
-                      <span class="pet-eye left"></span>
-                      <span class="pet-eye right"></span>
-                      <span class="pet-blush left"></span>
-                      <span class="pet-blush right"></span>
-                      <span class="pet-mouth"></span>
-                    </div>
-
-                    <!-- Mini Headphone for Dancing / Music Groove Mode -->
-                    <div id="pet-headphones" class="pet-headphones" style="display: none;">
-                      <span class="headphone-band"></span>
-                      <span class="headphone-cup left"></span>
-                      <span class="headphone-cup right"></span>
+                    <div class="idle-sleepy-face">
+                      <span class="idle-sleepy-eye left"></span>
+                      <span class="idle-sleepy-eye right"></span>
                     </div>
                   </div>
-
-                  <!-- Sleepy Zzz cloud (only visible when sleeping) -->
-                  <div id="idle-zzz-cloud" class="idle-zzz-cloud" style="display: none;">
+                  <div class="idle-zzz-cloud">
                     <span class="zzz z1">z</span>
                     <span class="zzz z2">z</span>
                     <span class="zzz z3">Z</span>
                   </div>
-
-                  <!-- Floating particles & hearts -->
-                  <div id="pet-particles-container" class="pet-particles-container"></div>
                 </div>
-
-                <!-- Pet Companion Stats & Interaction Tray -->
-                <div class="idle-pet-dashboard" data-tauri-drag-region>
-                  <div class="pet-header-row" data-tauri-drag-region>
-                    <div class="pet-title-wrap">
-                      <span id="pet-level-badge" class="pet-level-badge">Lv. 1</span>
-                      <span id="pet-name-title" class="pet-name-title">BaoBao Pet</span>
-                    </div>
-                    <span id="pet-mood-tag" class="pet-mood-tag">✨ Bahagia</span>
-                  </div>
-
-                  <!-- Exp Progress Bar -->
-                  <div class="pet-exp-container" title="EXP Level Companion">
-                    <div class="pet-exp-bar-track">
-                      <div id="pet-exp-bar-fill" class="pet-exp-bar-fill" style="width: 25%;"></div>
-                    </div>
-                    <span id="txt-pet-exp" class="txt-pet-exp">25 / 100 EXP</span>
-                  </div>
-
-                  <!-- Status Meters (Hunger & Mood) -->
-                  <div class="pet-meters-row" data-tauri-drag-region>
-                    <!-- Hunger -->
-                    <div class="pet-meter" title="Kekenyangan BaoBao">
-                      <span class="meter-icon">🥟</span>
-                      <div class="meter-bar-track">
-                        <div id="pet-hunger-fill" class="meter-bar-fill hunger-fill" style="width: 80%;"></div>
-                      </div>
-                      <span id="txt-pet-hunger" class="meter-val">80%</span>
-                    </div>
-
-                    <!-- Mood -->
-                    <div class="pet-meter" title="Kebahagiaan BaoBao">
-                      <span class="meter-icon">💖</span>
-                      <div class="meter-bar-track">
-                        <div id="pet-mood-fill" class="meter-bar-fill mood-fill" style="width: 90%;"></div>
-                      </div>
-                      <span id="txt-pet-mood" class="meter-val">90%</span>
-                    </div>
-                  </div>
-
-                  <!-- Action Buttons: Feed & Pet -->
-                  <div class="pet-actions-row" data-tauri-drag-region>
-                    <button id="btn-pet-feed" class="btn-pet-action feed-btn" title="Beri makan dumpling virtual (+Kenyang, +EXP, +Mood)">
-                      <span class="btn-pet-icon">🥟</span>
-                      <span id="txt-btn-feed">Beri Makan</span>
-                    </button>
-                    <button id="btn-pet-pat" class="btn-pet-action pat-btn" title="Elus BaoBao (+Mood, +EXP)">
-                      <span class="btn-pet-icon">💖</span>
-                      <span id="txt-btn-pat">Elus BaoBao</span>
-                    </button>
-                  </div>
+                <div class="idle-info-box" data-tauri-drag-region>
+                  <h4 class="idle-headline">Waiting for music...</h4>
+                  <p class="idle-caption">Play any song to start listening</p>
                 </div>
               </div>
 
