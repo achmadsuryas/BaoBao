@@ -32,7 +32,13 @@ BaoBao dapat mengecil menjadi kapsul pil mini yang tenang atau melebar (*expand*
 ### 🎵 1. Music Player & Synced Lyrics
 - **Real-time Synced Lyrics**: Menampilkan lirik lagu yang sedang berputar secara sinkron baris demi baris, baik pada header pil mini maupun tampilan lirik penuh (*Full Lyrics Stream*).
 - **Audio Controls & Sound Wave**: Tombol Play/Pause, Next, Previous, slider volume terintegrasi, dan visualizer audio soundwave yang hidup.
-- **Sleepy BaoBao (Idle State)**: Saat musik tidak diputar lebih dari beberapa saat, maskot BaoBao akan tertidur pulas lengkap dengan animasi awan `zZz` yang menggemaskan.
+- **BaoBao Virtual Companion & Tamagotchi System**: Maskot dumpling interaktif hidup!
+  - ⭐ **Level & EXP System**: Tingkatkan level keakraban BaoBao seiring pemakaian PC dan interaksi harian.
+  - 🥟 **Beri Makan (Feed)**: Suapi BaoBao dengan dumpling virtual untuk menjaga rasa kenyang (*Hunger Meter*) dengan efek suara kunyah renyah `nom nom`!
+  - 💖 **Elus BaoBao (Pet & Pat)**: Klik maskot atau logo BaoBao di header kapan saja untuk mengelusnya, memunculkan hati melayang dan ekspresi wajah bahagia (*blushing*).
+  - 🎧 **Music Groove & Dancing**: Saat lagu diputar, BaoBao mengenakan headphone mini dan ikut berjoget mengikuti irama!
+  - ⚡ **Mode Semangat (Typing Frenzy)**: Saat kamu mengetik cepat di keyboard, mata BaoBao berbinar bintang (*starry eyes*) dan melompat menyemangatimu bekerja!
+  - 😴 **Sleepy State**: Saat idle santai, BaoBao tertidur pulas dengan gelembung `zZz` yang menggemaskan.
 
 ### 🗄️ 2. Shelf (Desktop Stash & Quick Launcher)
 - **Drag & Drop Tray**: Tarik dan lepaskan (*drag & drop*) file, folder, dokumen, atau shortcut aplikasi langsung ke pulau untuk disimpan sementara.

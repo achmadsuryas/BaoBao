@@ -1261,24 +1261,112 @@ html, body {
 
 .idle-mascot-box {
   position: relative;
-  width: 64px;
-  height: 60px;
+  width: 78px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
+/* Speech Bubble above Mascot */
+.pet-dialog-bubble {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  background: rgba(18, 22, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 8px var(--theme-glow);
+  z-index: 10;
+  transition: all 0.25s cubic-bezier(0.34, 1.35, 0.64, 1);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pet-dialog-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px 4px 0 4px;
+  border-style: solid;
+  border-color: rgba(18, 22, 28, 0.95) transparent transparent transparent;
+}
+
+/* Interactive Tamagotchi Dumpling Mascot */
 .idle-dumpling-mascot {
   position: relative;
-  width: 56px;
-  height: 52px;
+  width: 60px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--theme-accent);
-  filter: drop-shadow(0 0 14px var(--theme-glow));
+  filter: drop-shadow(0 0 16px var(--theme-glow));
   animation: idleBreathing 3.2s ease-in-out infinite alternate;
+  transition: transform 0.2s cubic-bezier(0.34, 1.35, 0.64, 1);
+}
+
+.pet-interactive:hover {
+  transform: scale(1.08) translateY(-2px);
+}
+
+.pet-interactive:active {
+  transform: scale(0.92) translateY(2px);
+}
+
+/* Pet Animation: Dancing (Grooving to Music) */
+.pet-interactive.dancing {
+  animation: petDancing 0.65s ease-in-out infinite alternate !important;
+}
+
+@keyframes petDancing {
+  0% { transform: scale(1.02) rotate(-6deg) translateY(0); }
+  50% { transform: scale(0.97) rotate(0deg) translateY(-4px); }
+  100% { transform: scale(1.04) rotate(6deg) translateY(0); }
+}
+
+/* Pet Animation: Eating (Munching Dumpling) */
+.pet-interactive.eating {
+  animation: petMunching 0.28s ease-in-out 4 alternate !important;
+}
+
+@keyframes petMunching {
+  0% { transform: scale(1, 1); }
+  50% { transform: scale(1.18, 0.88); }
+  100% { transform: scale(0.95, 1.1); }
+}
+
+/* Pet Animation: Typing Frenzy (Semangat Mode) */
+.pet-interactive.typing-frenzy {
+  animation: petFrenzy 0.2s ease-in-out infinite alternate !important;
+}
+
+@keyframes petFrenzy {
+  0% { transform: translateY(0) scale(1.04); }
+  100% { transform: translateY(-5px) scale(1.1) rotate(2deg); }
+}
+
+/* Pet Animation: Loving (When Petted) */
+.pet-interactive.loving {
+  animation: petLoving 0.4s ease-out forwards !important;
+}
+
+@keyframes petLoving {
+  0% { transform: scale(0.92); }
+  50% { transform: scale(1.15) translateY(-4px); }
+  100% { transform: scale(1); }
 }
 
 @keyframes idleBreathing {
@@ -1287,31 +1375,132 @@ html, body {
 }
 
 .idle-dumpling-svg {
-  width: 56px;
-  height: 52px;
+  width: 60px;
+  height: 56px;
   display: block;
 }
 
-.idle-sleepy-face {
+/* Dynamic Expressions Face */
+.idle-pet-face {
   position: absolute;
-  top: 26px;
+  top: 27px;
   left: 0;
   right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 13px;
   pointer-events: none;
 }
 
-.idle-sleepy-eye {
+.pet-eye {
   width: 7.5px;
-  height: 2.4px;
+  height: 7.5px;
   background: #ffffff;
-  border-radius: 2px;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.95), 0 0 6px var(--theme-glow);
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.95), 0 0 8px var(--theme-glow);
+  position: absolute;
+  top: 0;
+  transition: all 0.2s ease;
 }
 
+.pet-eye.left { left: 16px; }
+.pet-eye.right { right: 16px; }
+
+/* Rosy Blushing Cheeks */
+.pet-blush {
+  width: 7px;
+  height: 4px;
+  background: rgba(244, 63, 94, 0.7);
+  border-radius: 50%;
+  position: absolute;
+  top: 6px;
+  filter: blur(1px);
+}
+
+.pet-blush.left { left: 12px; }
+.pet-blush.right { right: 12px; }
+
+.pet-mouth {
+  width: 5px;
+  height: 3px;
+  border-bottom: 1.5px solid #ffffff;
+  border-radius: 0 0 4px 4px;
+  position: absolute;
+  top: 5px;
+  transition: all 0.2s ease;
+}
+
+/* Expressions: Happy (Curved Eyes) */
+.idle-pet-face.mood-happy .pet-eye {
+  height: 3px;
+  border-radius: 4px 4px 0 0;
+}
+
+/* Expressions: Sleepy (Slanted Closed Eyes) */
+.idle-pet-face.mood-sleepy .pet-eye {
+  height: 2px;
+  border-radius: 2px;
+}
+.idle-pet-face.mood-sleepy .pet-mouth {
+  width: 3px;
+  height: 1px;
+}
+
+/* Expressions: Eating (Open O-Mouth) */
+.idle-pet-face.mood-eating .pet-mouth {
+  width: 6px;
+  height: 6px;
+  background: #ffffff;
+  border-radius: 50%;
+  border: none;
+  animation: mouthChew 0.25s infinite alternate;
+}
+
+@keyframes mouthChew {
+  0% { transform: scale(0.8); }
+  100% { transform: scale(1.2); }
+}
+
+/* Expressions: Starry Eyes (Fast typing / exciting) */
+.idle-pet-face.mood-starry .pet-eye {
+  background: #facc15;
+  box-shadow: 0 0 8px #facc15;
+  transform: scale(1.2);
+}
+
+/* Mini Headphone for Groove / Dancing Mode */
+.pet-headphones {
+  position: absolute;
+  top: 10px;
+  left: 4px;
+  right: 4px;
+  pointer-events: none;
+}
+
+.headphone-band {
+  display: block;
+  width: 48px;
+  height: 18px;
+  border: 2.5px solid #ffffff;
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  margin: 0 auto;
+}
+
+.headphone-cup {
+  position: absolute;
+  top: 12px;
+  width: 7px;
+  height: 12px;
+  background: var(--theme-accent);
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+}
+
+.headphone-cup.left { left: 0px; }
+.headphone-cup.right { right: 0px; }
+
+/* Sleepy Zzz cloud */
 .idle-zzz-cloud {
   position: absolute;
   top: -4px;
@@ -1338,25 +1527,253 @@ html, body {
   100% { opacity: 0; transform: translate(10px, -14px) scale(1.2); }
 }
 
-.idle-info-box {
+/* Floating Hearts & Food Particles */
+.pet-particles-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.pet-floating-heart {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  font-size: 14px;
+  color: #f43f5e;
+  filter: drop-shadow(0 0 6px #f43f5e);
+  animation: floatHeart 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+  z-index: 30;
+}
+
+@keyframes floatHeart {
+  0% { opacity: 1; transform: translate(-50%, 0) scale(0.6); }
+  50% { transform: translate(calc(-50% + var(--dx, 0px)), -22px) scale(1.2); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx, 0px)), -42px) scale(0.8); }
+}
+
+.pet-food-fly {
+  position: absolute;
+  font-size: 16px;
+  animation: flyFoodToMouth 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+  z-index: 30;
+}
+
+@keyframes flyFoodToMouth {
+  0% { opacity: 1; transform: translate(40px, 15px) scale(1.1); }
+  80% { transform: translate(0, 0) scale(0.9); opacity: 1; }
+  100% { transform: translate(-6px, 2px) scale(0.2); opacity: 0; }
+}
+
+/* ============================================
+   Tamagotchi Pet Companion Dashboard
+   ============================================ */
+
+.idle-pet-dashboard {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex: 1;
   min-width: 0;
+  padding-left: 10px;
 }
 
-.idle-headline {
-  font-size: 14px;
+.pet-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.pet-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pet-level-badge {
+  background: var(--theme-accent-gradient);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px var(--theme-glow);
+  letter-spacing: 0.3px;
+}
+
+.pet-name-title {
+  font-size: 12px;
   font-weight: 700;
   color: #ffffff;
-  margin-bottom: 3px;
-  letter-spacing: -0.1px;
+  white-space: nowrap;
 }
 
-.idle-caption {
-  font-size: 11.5px;
-  font-weight: 400;
-  color: #8e8e93;
+.pet-mood-tag {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--theme-accent);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* EXP Bar */
+.pet-exp-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.pet-exp-bar-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pet-exp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+  transition: width 0.35s ease;
+}
+
+.txt-pet-exp {
+  font-size: 8.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Status Meters: Hunger & Mood */
+.pet-meters-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.pet-meter {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 5px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.meter-icon {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.meter-bar-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.meter-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.35s ease, background-color 0.3s ease;
+}
+
+.meter-bar-fill.hunger-fill {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.meter-bar-fill.hunger-fill.hungry {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+}
+
+.meter-bar-fill.mood-fill {
+  background: linear-gradient(90deg, #ec4899, #f43f5e);
+  box-shadow: 0 0 6px rgba(244, 63, 94, 0.5);
+}
+
+.meter-val {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pet Action Buttons */
+.pet-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-pet-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 4px 6px;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.34, 1.35, 0.64, 1);
+}
+
+.btn-pet-action:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--theme-accent);
+  color: var(--theme-accent);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 8px var(--theme-glow);
+}
+
+.btn-pet-action:active {
+  transform: scale(0.94);
+}
+
+.btn-pet-icon {
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* Header Baobao Logo Pet Click effect */
+.baobao-logo.petted {
+  animation: logoPetSquish 0.35s cubic-bezier(0.34, 1.35, 0.64, 1) !important;
+}
+
+@keyframes logoPetSquish {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35, 0.85); }
+  75% { transform: scale(0.9, 1.15); }
+  100% { transform: scale(1); }
+}
+
+.baobao-logo.grooving {
+  animation: logoGrooving 0.7s ease-in-out infinite alternate !important;
+}
+
+@keyframes logoGrooving {
+  0% { transform: rotate(-5deg) translateY(0); }
+  100% { transform: rotate(5deg) translateY(-2px); }
 }
 
 /* ============================================
