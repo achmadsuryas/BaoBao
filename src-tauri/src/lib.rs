@@ -52,7 +52,7 @@ fn get_media_state() -> MediaPayload {
         .unwrap_or_default()
 }
 
-/// Toggle Play / Pause on the current Windows active media session.
+/// Toggle Play / Pause on the current active media session.
 #[tauri::command]
 fn media_toggle_play_pause() -> Result<(), String> {
     #[cfg(windows)]
@@ -66,10 +66,21 @@ fn media_toggle_play_pause() -> Result<(), String> {
             let _ = session.TryTogglePlayPauseAsync();
         }
     }
+    #[cfg(target_os = "macos")]
+    {
+        let script = r#"
+            if application "Spotify" is running then
+                tell application "Spotify" to playpause
+            else if application "Music" is running then
+                tell application "Music" to playpause
+            end if
+        "#;
+        let _ = std::process::Command::new("osascript").args(["-e", script]).output();
+    }
     Ok(())
 }
 
-/// Skip to the next track on Windows active media session.
+/// Skip to the next track on active media session.
 #[tauri::command]
 fn media_next() -> Result<(), String> {
     #[cfg(windows)]
@@ -83,10 +94,21 @@ fn media_next() -> Result<(), String> {
             let _ = session.TrySkipNextAsync();
         }
     }
+    #[cfg(target_os = "macos")]
+    {
+        let script = r#"
+            if application "Spotify" is running then
+                tell application "Spotify" to next track
+            else if application "Music" is running then
+                tell application "Music" to next track
+            end if
+        "#;
+        let _ = std::process::Command::new("osascript").args(["-e", script]).output();
+    }
     Ok(())
 }
 
-/// Skip to the previous track on Windows active media session.
+/// Skip to the previous track on active media session.
 #[tauri::command]
 fn media_prev() -> Result<(), String> {
     #[cfg(windows)]
@@ -100,10 +122,21 @@ fn media_prev() -> Result<(), String> {
             let _ = session.TrySkipPreviousAsync();
         }
     }
+    #[cfg(target_os = "macos")]
+    {
+        let script = r#"
+            if application "Spotify" is running then
+                tell application "Spotify" to previous track
+            else if application "Music" is running then
+                tell application "Music" to previous track
+            end if
+        "#;
+        let _ = std::process::Command::new("osascript").args(["-e", script]).output();
+    }
     Ok(())
 }
 
-/// Seek playback to a specific position in seconds (Coucou port).
+/// Seek playback to a specific position in seconds.
 #[tauri::command]
 fn media_seek(position_secs: f64) -> Result<(), String> {
     #[cfg(windows)]
@@ -118,6 +151,17 @@ fn media_seek(position_secs: f64) -> Result<(), String> {
             let _ = session.TryChangePlaybackPositionAsync(ticks);
         }
     }
+    #[cfg(target_os = "macos")]
+    {
+        let script = format!(r#"
+            if application "Spotify" is running then
+                tell application "Spotify" to set player position to {}
+            else if application "Music" is running then
+                tell application "Music" to set player position to {}
+            end if
+        "#, position_secs, position_secs);
+        let _ = std::process::Command::new("osascript").args(["-e", &script]).output();
+    }
     Ok(())
 }
 
@@ -131,9 +175,13 @@ fn open_spotify() {
             .args(&["/C", "start", "spotify:"])
             .spawn();
     }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open").arg("-a").arg("Spotify").spawn();
+    }
 }
 
-/// Open any file, folder, shortcut, or app with default application without console window flashing
+/// Open any file, folder, shortcut, or app with default application
 #[tauri::command]
 fn open_file_path(path: String) -> Result<(), String> {
     #[cfg(windows)]
@@ -147,7 +195,11 @@ fn open_file_path(path: String) -> Result<(), String> {
             .spawn()
             .map_err(|e| e.to_string())?;
     }
-    #[cfg(not(windows))]
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open").arg(&path).spawn();
+    }
+    #[cfg(all(not(windows), not(target_os = "macos")))]
     {
         let _ = std::process::Command::new("xdg-open").arg(&path).spawn();
     }
@@ -454,6 +506,42 @@ fn set_autostart(enable: bool) -> Result<(), String> {
                 .status();
         }
     }
+    #[cfg(target_os = "macos")]
+    {
+        use std::process::Command;
+        let app_path = std::env::current_exe()
+            .ok()
+            .and_then(|p| {
+                let mut curr = p.as_path();
+                while let Some(parent) = curr.parent() {
+                    if curr.extension().and_then(|s| s.to_str()) == Some("app") {
+                        return Some(curr.to_string_lossy().to_string());
+                    }
+                    curr = parent;
+                }
+                Some(p.to_string_lossy().to_string())
+            })
+            .unwrap_or_else(|| "/Applications/BaoBao.app".to_string());
+
+        if enable {
+            let script = format!(
+                r#"tell application "System Events"
+                    if not (exists login item "BaoBao") then
+                        make new login item at end with properties {{name:"BaoBao", path:"{}", hidden:false}}
+                    end if
+                end tell"#,
+                app_path
+            );
+            let _ = Command::new("osascript").args(["-e", &script]).output();
+        } else {
+            let script = r#"tell application "System Events"
+                if exists login item "BaoBao" then
+                    delete login item "BaoBao"
+                end if
+            end tell"#;
+            let _ = Command::new("osascript").args(["-e", script]).output();
+        }
+    }
     Ok(())
 }
 
@@ -489,6 +577,17 @@ fn get_autostart() -> bool {
             .output();
         if let Ok(out) = legacy_output {
             return out.status.success();
+        }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        use std::process::Command;
+        let script = r#"tell application "System Events" to (exists login item "BaoBao") as string"#;
+        if let Ok(out) = Command::new("osascript").args(["-e", script]).output() {
+            let res = String::from_utf8_lossy(&out.stdout).trim().to_lowercase();
+            if res == "true" {
+                return true;
+            }
         }
     }
     false
@@ -539,7 +638,21 @@ fn get_volume() -> Result<f32, String> {
         };
         Ok(level)
     }
-    #[cfg(not(windows))]
+    #[cfg(target_os = "macos")]
+    {
+        use std::process::Command;
+        let output = Command::new("osascript")
+            .args(["-e", "output volume of (get volume settings)"])
+            .output()
+            .map_err(|e| e.to_string())?;
+        let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if let Ok(vol_pct) = text.parse::<f32>() {
+            Ok((vol_pct / 100.0).clamp(0.0, 1.0))
+        } else {
+            Ok(1.0)
+        }
+    }
+    #[cfg(not(any(windows, target_os = "macos")))]
     Ok(1.0)
 }
 
@@ -554,7 +667,15 @@ fn set_volume(volume: f32) -> Result<(), String> {
         }
         Ok(())
     }
-    #[cfg(not(windows))]
+    #[cfg(target_os = "macos")]
+    {
+        use std::process::Command;
+        let vol_int = ((volume.clamp(0.0, 1.0)) * 100.0).round() as u32;
+        let script = format!("set volume output volume {}", vol_int);
+        let _ = Command::new("osascript").args(["-e", &script]).output();
+        Ok(())
+    }
+    #[cfg(not(any(windows, target_os = "macos")))]
     Ok(())
 }
 
@@ -867,9 +988,118 @@ fn start_media_listener(app: AppHandle) {
     });
 }
 
-#[cfg(not(windows))]
+#[cfg(target_os = "macos")]
+fn start_media_listener(app: AppHandle) {
+    use std::process::Command;
+
+    thread::spawn(move || {
+        println!("[BaoBao] macOS media listener started (Spotify & Apple Music polling)");
+
+        let mut last_title = String::new();
+        let mut last_artist = String::new();
+        let mut last_is_playing = false;
+        let mut last_pos = 0.0;
+
+        let script = r#"
+            if application "Spotify" is running then
+                tell application "Spotify"
+                    set pState to player state as string
+                    set cTrack to current track
+                    set tName to name of cTrack
+                    set tArtist to artist of cTrack
+                    set tAlbum to album of cTrack
+                    set tDur to (duration of cTrack) / 1000
+                    set tPos to player position
+                    set tArt to artwork url of cTrack
+                    return pState & "|||" & tName & "|||" & tArtist & "|||" & tAlbum & "|||" & tDur & "|||" & tPos & "|||" & tArt
+                end tell
+            else if application "Music" is running then
+                tell application "Music"
+                    set pState to player state as string
+                    set cTrack to current track
+                    set tName to name of cTrack
+                    set tArtist to artist of cTrack
+                    set tAlbum to album of cTrack
+                    set tDur to duration of cTrack
+                    set tPos to player position
+                    return pState & "|||" & tName & "|||" & tArtist & "|||" & tAlbum & "|||" & tDur & "|||" & tPos & "|||"
+                end tell
+            else
+                return "inactive"
+            end if
+        "#;
+
+        loop {
+            thread::sleep(Duration::from_millis(1000));
+
+            let output = Command::new("osascript")
+                .args(["-e", script])
+                .output();
+
+            if let Ok(out) = output {
+                let stdout = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                if stdout == "inactive" || stdout.is_empty() {
+                    let mut lock = CURRENT_MEDIA.lock().unwrap();
+                    if lock.is_some() {
+                        *lock = None;
+                        drop(lock);
+                        let _ = app.emit("media-changed", MediaPayload::default());
+                    }
+                    continue;
+                }
+
+                let parts: Vec<&str> = stdout.split("|||").collect();
+                if parts.len() >= 6 {
+                    let p_state = parts[0].trim().to_lowercase();
+                    let is_playing = p_state == "playing";
+                    let title = parts[1].trim().to_string();
+                    let artist = parts[2].trim().to_string();
+                    let album = parts[3].trim().to_string();
+                    let duration_secs = parts[4].trim().parse::<f64>().unwrap_or(0.0);
+                    let position_secs = parts[5].trim().parse::<f64>().unwrap_or(0.0);
+                    let cover_data_url = if parts.len() > 6 && !parts[6].trim().is_empty() {
+                        Some(parts[6].trim().to_string())
+                    } else {
+                        None
+                    };
+
+                    let has_changed = title != last_title
+                        || artist != last_artist
+                        || is_playing != last_is_playing
+                        || (position_secs - last_pos).abs() > 2.5;
+
+                    if has_changed {
+                        last_title = title.clone();
+                        last_artist = artist.clone();
+                        last_is_playing = is_playing;
+                        last_pos = position_secs;
+
+                        let payload = MediaPayload {
+                            title,
+                            artist,
+                            album,
+                            is_playing,
+                            position_secs,
+                            position_at_ms: now_ms(),
+                            duration_secs,
+                            cover_data_url,
+                        };
+
+                        let mut lock = CURRENT_MEDIA.lock().unwrap();
+                        *lock = Some(payload.clone());
+                        drop(lock);
+
+                        let _ = app.emit("media-changed", payload);
+                    }
+                }
+            }
+        }
+    });
+}
+
+#[cfg(not(any(windows, target_os = "macos")))]
 fn start_media_listener(_app: AppHandle) {
-    eprintln!("[Baobao] SMTC is only supported on Windows");
+    eprintln!("[Baobao] Media listener is not supported on this platform");
 }
 
 #[cfg(windows)]

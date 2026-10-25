@@ -5,12 +5,12 @@
 <h1 align="center">BaoBao (宝宝) 🥟</h1>
 
 <p align="center">
-  <b>Dynamic Island Desktop Widget yang Imut, Ringan, dan Produktif untuk Windows</b><br>
+  <b>Dynamic Island Desktop Widget yang Imut, Ringan, dan Produktif untuk Windows & macOS (MacBook)</b><br>
   <i>A cute, sleek & minimalist floating desktop companion powered by Tauri & Rust.</i>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows" />
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS-0078D6?style=for-the-badge&logo=apple&logoColor=white" alt="Windows & macOS" />
   <img src="https://img.shields.io/badge/Tauri-v2-FFC131?style=for-the-badge&logo=tauri&logoColor=black" alt="Tauri" />
   <img src="https://img.shields.io/badge/Rust-Backend-dea584?style=for-the-badge&logo=rust&logoColor=black" alt="Rust" />
   <img src="https://img.shields.io/badge/TypeScript-Frontend-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
@@ -21,7 +21,7 @@
 
 ## 📖 Apa itu BaoBao?
 
-**BaoBao (宝宝)** adalah aplikasi *desktop widget* mengambang yang terinspirasi dari konsep **Dynamic Island**, dirancang khusus untuk mempercantik desktop Anda sekaligus meningkatkan produktivitas harian. 
+**BaoBao (宝宝)** adalah aplikasi *desktop widget* mengambang yang terinspirasi dari konsep **Dynamic Island**, dirancang khusus untuk mempercantik desktop Anda sekaligus meningkatkan produktivitas harian baik di **Windows** maupun **macOS** (MacBook M-series & Intel). 
 
 BaoBao dapat mengecil menjadi kapsul pil mini yang tenang atau melebar (*expand*) menjadi pusat kendali multifungsi hanya dengan satu klik atau hover.
 
@@ -64,7 +64,10 @@ Anda dapat langsung mengunduh file installer resmi BaoBao melalui tombol direct 
 
 <p align="center">
   <a href="https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64-setup.exe">
-    <img src="https://img.shields.io/badge/Download-BaoBao%20Setup%20(.exe)-2ea44f?style=for-the-badge&logo=windows&logoColor=white" alt="Download Installer .exe" />
+    <img src="https://img.shields.io/badge/Download-Windows%20Setup%20(.exe)-2ea44f?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows Installer .exe" />
+  </a>
+  <a href="https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_aarch64.dmg">
+    <img src="https://img.shields.io/badge/Download-macOS%20Disk%20Image%20(.dmg)-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download macOS DMG" />
   </a>
   <a href="https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64_en-US.msi">
     <img src="https://img.shields.io/badge/Download-Windows%20Package%20(.msi)-0969da?style=for-the-badge&logo=windows&logoColor=white" alt="Download MSI" />
@@ -73,22 +76,27 @@ Anda dapat langsung mengunduh file installer resmi BaoBao melalui tombol direct 
 
 ### 📁 Pilihan File yang Tersedia:
 
-| File | Tipe | Link Unduh Langsung | Keterangan & Rekomendasi |
-| :--- | :--- | :--- | :--- |
-| **`BaoBao_0.1.0_x64-setup.exe`** | **NSIS Setup** | [⬇️ **Download .exe**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64-setup.exe) | ✨ **Paling Direkomendasikan.** Installer otomatis, membuat shortcut di Desktop dan Start Menu secara instan. |
-| **`BaoBao_0.1.0_x64_en-US.msi`** | **MSI Package** | [⬇️ **Download .msi**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64_en-US.msi) | Paket instalasi standar MSI untuk sistem Windows. Cocok untuk lingkungan deployment atau instalasi bersih. |
+| File | Sistem Operasi | Tipe | Link Unduh Langsung | Keterangan & Rekomendasi |
+| :--- | :--- | :--- | :--- | :--- |
+| **`BaoBao_0.1.0_x64-setup.exe`** | Windows 10/11 | **NSIS Setup** | [⬇️ **Download .exe**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64-setup.exe) | ✨ **Paling Direkomendasikan untuk Windows.** Installer otomatis, membuat shortcut di Desktop dan Start Menu secara instan. |
+| **`BaoBao_0.1.0_aarch64.dmg`** | macOS (Apple Silicon M1/M2/M3/M4) | **Apple Disk Image** | [⬇️ **Download .dmg**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_aarch64.dmg) | 🍏 **Paling Direkomendasikan untuk MacBook/Mac.** Drag & drop langsung ke folder `Applications`. |
+| **`BaoBao_0.1.0_x64_en-US.msi`** | Windows 10/11 | **MSI Package** | [⬇️ **Download .msi**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64_en-US.msi) | Paket instalasi standar MSI untuk Windows. |
 
 ---
 
 ### 🚀 Cara Mengunduh & Memasang:
 
-1. Unduh file installer melalui tautan langsung:  
-   👉 [**Download BaoBao Versi Terbaru**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64-setup.exe) *(atau lihat semua versi di [GitHub Releases](https://github.com/achmadsuryas/BaoBao-Release/releases))*
-2. Setelah file selesai diunduh, buka file tersebut untuk memulai pemasangan.
-3. *Catatan Windows SmartScreen*: Jika muncul notifikasi proteksi *"Windows protected your PC"*, jangan khawatir—ini normal untuk aplikasi baru independen:
-   - Klik **"More info"** (*Informasi selengkapnya*)
-   - Klik tombol **"Run anyway"** (*Tetap jalankan*)
-4. Nikmati kehadiran BaoBao di desktop Anda! 🥟🎉
+#### Untuk Windows:
+1. Unduh `BaoBao_0.1.0_x64-setup.exe`.
+2. Buka file installer untuk memulai instalasi.
+3. Jika muncul notifikasi proteksi *Windows SmartScreen* (*"Windows protected your PC"*): Klik **"More info"** -> Klik **"Run anyway"**.
+4. Selesai!
+
+#### Untuk macOS (MacBook / iMac / Mac Mini):
+1. Unduh `BaoBao_0.1.0_aarch64.dmg` (atau versi Intel jika menggunakan Mac model lama).
+2. Buka file `.dmg` yang diunduh, lalu seret ikon **BaoBao** ke folder **Applications**.
+3. Saat pertama kali dibuka di macOS, jika muncul peringatan Gatekeeper: Buka **System Settings** -> **Privacy & Security** -> Klik **Open Anyway** pada BaoBao.
+4. Nikmati kehadiran BaoBao di desktop Mac Anda! 🥟🎉
 
 ---
 

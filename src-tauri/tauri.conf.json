@@ -37,7 +37,7 @@
     "active": true,
     "publisher": "Achmad Surya",
     "copyright": "Copyright © 2026 Achmad Surya",
-    "targets": ["nsis", "msi"],
+    "targets": ["nsis", "msi", "dmg", "app"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -49,6 +49,10 @@
       "nsis": {
         "installMode": "currentUser"
       }
+    },
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.15"
     }
   }
 }
