@@ -32,6 +32,12 @@
             <div id="pill-lyrics-container" class="pill-lyrics-container" style="display: none;" data-tauri-drag-region>
               <span id="pill-lyric-text" class="pill-lyric-text">In My Blood</span>
             </div>
+            <!-- Dynamic Island Device Connection Banner -->
+            <div id="pill-device-alert" class="pill-device-alert" style="display: none;" data-tauri-drag-region>
+              <div class="device-alert-halo"></div>
+              <span id="pill-device-icon" class="pill-device-icon">🎧</span>
+              <span id="pill-device-text" class="pill-device-text">Connected</span>
+            </div>
             <span id="full-datetime" class="full-datetime">Fri 23 Oct 2026 <strong>21:20</strong></span>
           </div>
 
@@ -222,7 +228,107 @@
               </div>
             </div>
 
-            <!-- Slide 2: Shelf (Desktop Icon Stash & Launcher) -->
+            <!-- Slide 2: Devices & Hardware Connectivity -->
+            <div id="slide-devices" class="slide" data-tauri-drag-region>
+              <div class="devices-dashboard" data-tauri-drag-region>
+                <div class="devices-cards-grid" data-tauri-drag-region>
+                  <!-- Card 1: Battery -->
+                  <div class="device-card card-battery" id="card-battery" title="Click to open Power & Battery Settings">
+                    <div class="card-glass-glow"></div>
+                    <div class="device-card-header">
+                      <div class="device-icon-wrapper battery-icon-box">
+                        <svg class="battery-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="1" y="6" width="18" height="12" rx="2" ry="2"></rect>
+                          <line x1="23" y1="11" x2="23" y2="13"></line>
+                        </svg>
+                        <svg id="battery-bolt-icon" class="battery-bolt" viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                      </div>
+                      <span class="device-status-badge badge-battery" id="badge-battery-status">On Battery</span>
+                    </div>
+                    <div class="device-card-body">
+                      <div class="device-value-row">
+                        <span class="device-primary-val" id="val-battery-percent">--%</span>
+                        <div class="battery-mini-bar">
+                          <div class="battery-mini-fill" id="fill-battery-bar" style="width: 80%;"></div>
+                        </div>
+                      </div>
+                      <span class="device-card-sub" id="lbl-battery-desc">Internal Battery</span>
+                    </div>
+                  </div>
+
+                  <!-- Card 2: Wi-Fi / Network -->
+                  <div class="device-card card-network" id="card-network" title="Click to open Network & Wi-Fi Settings">
+                    <div class="card-glass-glow"></div>
+                    <div class="device-card-header">
+                      <div class="device-icon-wrapper wifi-icon-box">
+                        <svg class="wifi-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                          <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                          <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                        </svg>
+                      </div>
+                      <span class="device-status-badge badge-network" id="badge-network-status">Connected</span>
+                    </div>
+                    <div class="device-card-body">
+                      <div class="device-value-row">
+                        <span class="device-primary-val truncate" id="val-network-name">Wi-Fi</span>
+                        <span class="signal-tag" id="val-network-signal">100%</span>
+                      </div>
+                      <span class="device-card-sub" id="lbl-network-desc">Internet Access</span>
+                    </div>
+                  </div>
+
+                  <!-- Card 3: Bluetooth -->
+                  <div class="device-card card-bluetooth" id="card-bluetooth" title="Click to open Bluetooth Settings">
+                    <div class="card-glass-glow"></div>
+                    <div class="device-card-header">
+                      <div class="device-icon-wrapper bluetooth-icon-box">
+                        <svg class="bluetooth-svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"></polyline>
+                        </svg>
+                        <span class="bluetooth-radar-pulse"></span>
+                      </div>
+                      <span class="device-status-badge badge-bluetooth" id="badge-bluetooth-status">Ready</span>
+                    </div>
+                    <div class="device-card-body">
+                      <div class="device-value-row">
+                        <span class="device-primary-val truncate" id="val-bluetooth-device">No Devices</span>
+                      </div>
+                      <span class="device-card-sub" id="lbl-bluetooth-desc">Bluetooth Active</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Footer Quick Actions & Demo Trigger -->
+                <div class="devices-footer-bar" data-tauri-drag-region>
+                  <div class="device-summary-chip truncate" id="device-summary-chip">
+                    <span class="dot-live"></span>
+                    <span id="txt-active-audio">Audio: Default</span>
+                  </div>
+                  <div class="devices-actions-group">
+                    <button id="btn-refresh-devices" class="btn-device-action" title="Refresh hardware detection">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                      </svg>
+                      <span id="txt-btn-refresh-dev">Refresh</span>
+                    </button>
+                    <button id="btn-test-alert" class="btn-device-action highlight" title="Test Connection Animation (Simulasi)">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                      </svg>
+                      <span id="txt-btn-test-alert">Test Alert</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3: Shelf (Desktop Icon Stash & Launcher) -->
             <div id="slide-shelf" class="slide" data-tauri-drag-region>
               <div id="shelf-drop-zone" class="shelf-zone" data-tauri-drag-region>
                 <!-- Empty Placeholder -->
@@ -403,7 +509,26 @@
                     </label>
                   </div>
 
-                  <div class="settings-item settings-item-compact" data-tauri-drag-region>
+                  
+                  <div id="settings-item-monitor" class="settings-item settings-item-compact" style="display: none;" data-tauri-drag-region>
+                    <div class="settings-meta">
+                      <div class="settings-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                          <line x1="8" y1="21" x2="16" y2="21"></line>
+                          <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                      </div>
+                      <div class="settings-texts">
+                        <span id="txt-monitor-label" class="settings-label">Display Monitor</span>
+                        <span id="txt-monitor-desc" class="settings-desc">Switch screen</span>
+                      </div>
+                    </div>
+                    <button id="btn-switch-monitor" class="btn-setting-action" title="Pindah ke monitor lain (Tengah Atas)">
+                      <span id="txt-current-monitor">Monitor 1 ⇄</span>
+                    </button>
+                  </div>
+<div class="settings-item settings-item-compact" data-tauri-drag-region>
                     <div class="settings-meta">
                       <div class="settings-icon">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -494,9 +619,10 @@
         <!-- Carousel Dots -->
         <div class="carousel-dots" data-tauri-drag-region>
           <span class="dot active" data-index="0" title="Music"></span>
-          <span class="dot" data-index="1" title="Shelf"></span>
-          <span class="dot" data-index="2" title="Notes"></span>
-          <span class="dot" data-index="3" title="Settings"></span>
+          <span class="dot" data-index="1" title="Devices"></span>
+          <span class="dot" data-index="2" title="Shelf"></span>
+          <span class="dot" data-index="3" title="Notes"></span>
+          <span class="dot" data-index="4" title="Settings"></span>
         </div>
       </div>
     </div>

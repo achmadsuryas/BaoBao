@@ -152,6 +152,39 @@ class SoundEffects {
       noise.stop(t + 0.18);
     } catch (_) {}
   }
+
+  /** Apple-like double crystal chime for device connection / charger plugged in */
+  playDeviceConnected() {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+
+      const osc1 = this.ctx.createOscillator();
+      const gain1 = this.ctx.createGain();
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(659.25, t);
+      gain1.gain.setValueAtTime(0.22, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc1.connect(gain1);
+      gain1.connect(this.ctx.destination);
+      osc1.start(t);
+      osc1.stop(t + 0.2);
+
+      const osc2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(987.77, t + 0.08);
+      gain2.gain.setValueAtTime(0.001, t);
+      gain2.gain.setValueAtTime(0.28, t + 0.08);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      osc2.connect(gain2);
+      gain2.connect(this.ctx.destination);
+      osc2.start(t + 0.08);
+      osc2.stop(t + 0.38);
+    } catch (_) {}
+  }
 }
 
 export const sfx = new SoundEffects();
@@ -254,6 +287,20 @@ const I18N: Record<Lang, Record<string, string>> = {
     langTitle: "Language",
     themeTitle: "Color Theme",
     shelfTitle: "Shelf",
+    devicesTitle: "Devices",
+    batteryLabel: "Battery",
+    batteryCharging: "Charging",
+    batteryDischarging: "On Battery",
+    wifiLabel: "Wi-Fi / Network",
+    wifiConnected: "Connected",
+    wifiDisconnected: "Disconnected",
+    bluetoothLabel: "Bluetooth",
+    bluetoothReady: "Ready",
+    bluetoothNoDevices: "No Devices",
+    bluetoothConnectedDevices: "Connected",
+    btnRefreshDevices: "Refresh",
+    btnTestAlert: "Test Alert",
+    tooltipDotDevices: "Devices & Connections",
     shelfDropTitle: "Drop files here",
     shelfDropSubtitle: "Drag files / folders / apps to stash",
     waitingMusic: "Waiting for music...",
@@ -313,6 +360,20 @@ const I18N: Record<Lang, Record<string, string>> = {
     langTitle: "Bahasa",
     themeTitle: "Tema Warna",
     shelfTitle: "Shelf",
+    devicesTitle: "Perangkat",
+    batteryLabel: "Baterai",
+    batteryCharging: "Mengisi Daya",
+    batteryDischarging: "Menggunakan Baterai",
+    wifiLabel: "Wi-Fi / Jaringan",
+    wifiConnected: "Terhubung",
+    wifiDisconnected: "Terputus",
+    bluetoothLabel: "Bluetooth",
+    bluetoothReady: "Siap",
+    bluetoothNoDevices: "Tidak ada perangkat",
+    bluetoothConnectedDevices: "Terhubung",
+    btnRefreshDevices: "Segarkan",
+    btnTestAlert: "Uji Animasi",
+    tooltipDotDevices: "Perangkat & Koneksi",
     shelfDropTitle: "Letakkan file di sini",
     shelfDropSubtitle: "Tarik file / folder / aplikasi ke sini",
     waitingMusic: "Menunggu musik...",
@@ -372,6 +433,20 @@ const I18N: Record<Lang, Record<string, string>> = {
     langTitle: "言語",
     themeTitle: "カラーテーマ",
     shelfTitle: "シェルフ",
+    devicesTitle: "デバイス",
+    batteryLabel: "バッテリー",
+    batteryCharging: "充電中",
+    batteryDischarging: "バッテリー駆動",
+    wifiLabel: "Wi-Fi / ネットワーク",
+    wifiConnected: "接続中",
+    wifiDisconnected: "未接続",
+    bluetoothLabel: "Bluetooth",
+    bluetoothReady: "待機中",
+    bluetoothNoDevices: "接続機器なし",
+    bluetoothConnectedDevices: "接続中",
+    btnRefreshDevices: "更新",
+    btnTestAlert: "アニメーション確認",
+    tooltipDotDevices: "デバイスと接続",
     shelfDropTitle: "ファイルをここにドロップ",
     shelfDropSubtitle: "ファイル・フォルダ・アプリを保管",
     waitingMusic: "音楽を待機中...",
@@ -466,9 +541,10 @@ function updateAllTooltips(dict: Record<string, string>): void {
   // Carousel dots
   const dots = document.querySelectorAll(".carousel-dots .dot");
   if (dots[0]) (dots[0] as HTMLElement).title = dict.tooltipDotMusic;
-  if (dots[1]) (dots[1] as HTMLElement).title = dict.tooltipDotShelf;
-  if (dots[2]) (dots[2] as HTMLElement).title = dict.tooltipDotNotes;
-  if (dots[3]) (dots[3] as HTMLElement).title = dict.tooltipDotSettings;
+  if (dots[1]) (dots[1] as HTMLElement).title = dict.tooltipDotDevices;
+  if (dots[2]) (dots[2] as HTMLElement).title = dict.tooltipDotShelf;
+  if (dots[3]) (dots[3] as HTMLElement).title = dict.tooltipDotNotes;
+  if (dots[4]) (dots[4] as HTMLElement).title = dict.tooltipDotSettings;
 }
 
 function applyLanguage(lang: Lang): void {
@@ -520,11 +596,17 @@ function applyLanguage(lang: Lang): void {
   const selectLang = document.getElementById("select-language") as HTMLSelectElement | null;
   if (selectLang) selectLang.value = lang;
 
+  const txtBtnRefreshDev = document.getElementById("txt-btn-refresh-dev");
+  if (txtBtnRefreshDev) txtBtnRefreshDev.textContent = dict.btnRefreshDevices;
+  const txtBtnTestAlert = document.getElementById("txt-btn-test-alert");
+  if (txtBtnTestAlert) txtBtnTestAlert.textContent = dict.btnTestAlert;
+
   const headerCat = document.getElementById("header-category");
   if (headerCat) {
-    if (currentSlide === 1) headerCat.textContent = dict.shelfTitle;
-    else if (currentSlide === 2) headerCat.textContent = dict.notesTitle;
-    else if (currentSlide === 3) headerCat.textContent = dict.settingsCategory;
+    if (currentSlide === 1) headerCat.textContent = dict.devicesTitle;
+    else if (currentSlide === 2) headerCat.textContent = dict.shelfTitle;
+    else if (currentSlide === 3) headerCat.textContent = dict.notesTitle;
+    else if (currentSlide === 4) headerCat.textContent = dict.settingsCategory;
     else headerCat.textContent = "";
   }
 
@@ -873,7 +955,7 @@ let currentMiniWidth = 330;
 
 function notifyIslandState(): void {
   const hasMiniLyrics = !isExpanded && !isMusicIdle && (currentMedia.is_playing || !!currentMedia.title) && activeLyrics.length > 0 && miniLyricsEnabled;
-  const isWide = ((isLyricsOpen || isInFullLyricsMode) && !isMusicIdle) || (isExpanded && currentSlide === 3);
+  const isWide = ((isLyricsOpen || isInFullLyricsMode) && !isMusicIdle) || (isExpanded && (currentSlide === 4 || currentSlide === 3));
   invoke("update_island_state", {
     expanded: isExpanded,
     withLyrics: isWide,
@@ -1783,13 +1865,14 @@ function collapseIsland(): void {
 // ============================================
 
 function setSlide(index: number): void {
-  const target = (index + 4) % 4;
+  const target = (index + 5) % 5;
   if (target === currentSlide) return;
 
   const goingRight = target > currentSlide;
   currentSlide = target;
 
   const slideMusic = document.getElementById("slide-music");
+  const slideDevices = document.getElementById("slide-devices");
   const slideShelf = document.getElementById("slide-shelf");
   const slideNotes = document.getElementById("slide-notes");
   const slideSettings = document.getElementById("slide-settings");
@@ -1797,7 +1880,7 @@ function setSlide(index: number): void {
   const dots = document.querySelectorAll(".carousel-dots .dot");
   const btnSettings = document.getElementById("btn-open-settings");
 
-  const slides = [slideMusic, slideShelf, slideNotes, slideSettings];
+  const slides = [slideMusic, slideDevices, slideShelf, slideNotes, slideSettings];
   slides.forEach((s, idx) => {
     if (!s) return;
     if (idx === currentSlide) {
@@ -1817,8 +1900,9 @@ function setSlide(index: number): void {
 
   const dict = I18N[currentLang] || I18N.en;
   const island = document.getElementById("island");
-  island?.classList.toggle("in-notes", currentSlide === 2);
-  island?.classList.toggle("in-settings", currentSlide === 3);
+  island?.classList.toggle("in-devices", currentSlide === 1);
+  island?.classList.toggle("in-notes", currentSlide === 3);
+  island?.classList.toggle("in-settings", currentSlide === 4);
   island?.classList.remove("with-editor");
   notifyIslandState();
 
@@ -1826,12 +1910,15 @@ function setSlide(index: number): void {
     if (headerCat) headerCat.textContent = "";
     btnSettings?.classList.remove("active");
   } else if (currentSlide === 1) {
-    if (headerCat) headerCat.textContent = dict.shelfTitle;
+    if (headerCat) headerCat.textContent = dict.devicesTitle;
     btnSettings?.classList.remove("active");
   } else if (currentSlide === 2) {
-    if (headerCat) headerCat.textContent = dict.notesTitle;
+    if (headerCat) headerCat.textContent = dict.shelfTitle;
     btnSettings?.classList.remove("active");
   } else if (currentSlide === 3) {
+    if (headerCat) headerCat.textContent = dict.notesTitle;
+    btnSettings?.classList.remove("active");
+  } else if (currentSlide === 4) {
     if (headerCat) headerCat.textContent = dict.settingsCategory;
     btnSettings?.classList.add("active");
   }
@@ -1850,6 +1937,54 @@ function setSlide(index: number): void {
 // ============================================
 
 window.addEventListener("DOMContentLoaded", async () => {
+
+  // --- Multi-Monitor Setup (Show Display Monitor only if multi-monitor > 1) ---
+  invoke<number>("get_monitors_count")
+    .then(async (count) => {
+      const monitorItem = document.getElementById("settings-item-monitor");
+      if (!monitorItem) return;
+      if (count > 1) {
+        monitorItem.style.display = "flex";
+        const currentLabel = await invoke<string>("get_current_monitor_label").catch(() => "Monitor 1");
+        const txt = document.getElementById("txt-current-monitor");
+        if (txt) txt.textContent = `${currentLabel} ⇄`;
+      } else {
+        monitorItem.style.display = "none";
+      }
+    })
+    .catch(() => {});
+
+  // 1-Click Monitor Switcher button
+  const btnSwitchMonitor = document.getElementById("btn-switch-monitor");
+  btnSwitchMonitor?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    sfx.playPop();
+    try {
+      const res = await invoke<string>("switch_monitor");
+      const lbl = document.getElementById("txt-current-monitor");
+      if (lbl && res) lbl.textContent = `${res} ⇄`;
+    } catch (err) {
+      console.error("switch_monitor error:", err);
+    }
+  });
+
+  // Dedicated wheel listener on left settings container so wheel scrolls list, NOT tab switch
+  const settingsLeftCol = document.querySelector(".settings-col");
+  settingsLeftCol?.addEventListener(
+    "wheel",
+    (e) => {
+      e.stopPropagation();
+    },
+    { passive: true }
+  );
+
+
+  
+
+  
+
+  
+
   window.addEventListener("contextmenu", (e) => e.preventDefault());
 
   // --- Normal Island Window Mode ---
@@ -1930,12 +2065,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     sfx.playClick();
     if (!isExpanded) {
       expandIsland();
-      setSlide(3);
+      setSlide(4);
     } else {
-      if (currentSlide === 3) {
+      if (currentSlide === 4) {
         setSlide(0);
       } else {
-        setSlide(3);
+        setSlide(4);
       }
     }
   });
@@ -2109,12 +2244,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     listen("tauri://drag-enter", () => {
       isDraggingFile = true;
       expandIsland();
-      setSlide(1);
+      setSlide(2);
     });
     listen("tauri://drag-over", () => {
       isDraggingFile = true;
       if (!isExpanded) expandIsland();
-      if (currentSlide !== 1) setSlide(1);
+      if (currentSlide !== 2) setSlide(2);
     });
     listen("tauri://drag-leave", () => {
       isDraggingFile = false;
@@ -2123,7 +2258,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       isDraggingFile = false;
       if (e.payload?.paths && e.payload.paths.length > 0) {
         expandIsland();
-        setSlide(1);
+        setSlide(2);
         await addFilesToShelf(e.payload.paths);
       }
     });
@@ -2133,13 +2268,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
     isDraggingFile = true;
     expandIsland();
-    setSlide(1);
+    setSlide(2);
   });
   window.addEventListener("dragover", (e) => {
     e.preventDefault();
     isDraggingFile = true;
     if (!isExpanded) expandIsland();
-    if (currentSlide !== 1) setSlide(1);
+    if (currentSlide !== 2) setSlide(2);
   });
   window.addEventListener("dragleave", () => {
     isDraggingFile = false;
@@ -2368,14 +2503,19 @@ window.addEventListener("DOMContentLoaded", async () => {
   const islandEl = document.getElementById("island");
   islandEl?.addEventListener("wheel", (e) => {
     const target = e.target as HTMLElement | null;
-    // Don't switch tabs if scrolling over volume, full lyrics list, shelf box, or notes tab
+    // Don't switch tabs if scrolling over volume, full lyrics list, shelf box, devices, notes, or settings
     if (
       target?.closest("#volume-group") ||
       target?.closest("#full-lyrics-stream") ||
       target?.closest("#shelf-drop-zone") ||
       target?.closest("#shelf-items-grid") ||
+      target?.closest("#slide-devices") ||
+      target?.closest(".devices-dashboard") ||
       target?.closest("#slide-notes") ||
       target?.closest(".notes-container") ||
+      target?.closest(".settings-col") ||
+      target?.closest("#slide-settings") ||
+      target?.closest(".settings-container") ||
       isInFullLyricsMode
     ) {
       return;
@@ -2436,4 +2576,290 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
     } catch (_) {}
   }, 1500);
+
+  // Initialize hardware device & connection monitoring
+  initDeviceMonitor();
 });
+
+// ============================================
+// Hardware Device & Connection Monitoring System
+// ============================================
+
+interface BatteryPayload {
+  percentage: number;
+  is_charging: boolean;
+  ac_connected: boolean;
+  battery_life_time?: number;
+}
+
+interface NetworkPayload {
+  is_connected: boolean;
+  connection_type: string;
+  ssid?: string;
+  signal_percent?: number;
+}
+
+interface BluetoothDeviceItem {
+  name: string;
+  device_type: string;
+  connected: boolean;
+}
+
+interface BluetoothPayload {
+  is_enabled: boolean;
+  devices: BluetoothDeviceItem[];
+}
+
+interface DeviceStatePayload {
+  battery: BatteryPayload;
+  network: NetworkPayload;
+  bluetooth: BluetoothPayload;
+  primary_audio_output?: string;
+}
+
+interface DeviceAlertPayload {
+  title: string;
+  message: string;
+  kind: string;
+  icon_type: string;
+}
+
+let deviceAlertTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function getAlertIconSvg(iconType: string): string {
+  switch (iconType) {
+    case "bolt":
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`;
+    case "headphones":
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>`;
+    case "wifi":
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>`;
+    case "bluetooth":
+    default:
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"></polyline></svg>`;
+  }
+}
+
+function showDeviceAlert(alert: DeviceAlertPayload): void {
+  const pill = document.getElementById("pill-device-alert");
+  const iconEl = document.getElementById("pill-alert-icon");
+  const titleEl = document.getElementById("pill-alert-title");
+  const msgEl = document.getElementById("pill-alert-msg");
+
+  if (!pill) return;
+
+  // Sound chime
+  sfx.playDeviceConnected();
+
+  if (iconEl) iconEl.innerHTML = getAlertIconSvg(alert.icon_type);
+  if (titleEl) titleEl.textContent = alert.title;
+  if (msgEl) msgEl.textContent = alert.message;
+
+  pill.classList.remove("alert-charging", "alert-bluetooth", "alert-network", "show");
+  if (alert.kind === "charging") pill.classList.add("alert-charging");
+  else if (alert.kind === "bluetooth") pill.classList.add("alert-bluetooth");
+  else if (alert.kind === "network") pill.classList.add("alert-network");
+
+  // Force DOM reflow to trigger animation restart
+  void pill.offsetWidth;
+  pill.classList.add("show");
+
+  // Animate the respective card in the devices slide
+  const cardBattery = document.getElementById("card-battery");
+  const cardNetwork = document.getElementById("card-network");
+  const cardBluetooth = document.getElementById("card-bluetooth");
+
+  let targetCard: HTMLElement | null = null;
+  if (alert.kind === "charging" || alert.icon_type === "bolt") {
+    targetCard = cardBattery;
+  } else if (alert.kind === "bluetooth" || alert.icon_type === "headphones") {
+    targetCard = cardBluetooth;
+  } else if (alert.kind === "network" || alert.icon_type === "wifi") {
+    targetCard = cardNetwork;
+  }
+
+  if (targetCard) {
+    targetCard.classList.remove("connected-ripple");
+    void targetCard.offsetWidth;
+    targetCard.classList.add("connected-ripple");
+    setTimeout(() => {
+      targetCard?.classList.remove("connected-ripple");
+    }, 2200);
+  }
+
+  if (deviceAlertTimeout) clearTimeout(deviceAlertTimeout);
+  deviceAlertTimeout = setTimeout(() => {
+    pill.classList.remove("show");
+  }, 4400);
+}
+
+function updateDeviceUI(state: DeviceStatePayload): void {
+  const dict = I18N[currentLang] || I18N.en;
+
+  // 1. Battery Card
+  const cardBattery = document.getElementById("card-battery");
+  const txtBatVal = document.getElementById("txt-battery-val");
+  const txtBatSub = document.getElementById("txt-battery-sub");
+  const batFill = document.getElementById("battery-bar-fill");
+
+  const pct = Math.min(100, Math.max(0, state.battery.percentage));
+  if (txtBatVal) txtBatVal.textContent = `${pct}%`;
+  if (batFill) batFill.style.width = `${pct}%`;
+
+  if (cardBattery) {
+    cardBattery.classList.toggle("charging", state.battery.is_charging || state.battery.ac_connected);
+    cardBattery.classList.toggle("low", pct <= 20 && !state.battery.is_charging);
+  }
+
+  if (txtBatSub) {
+    txtBatSub.textContent = (state.battery.is_charging || state.battery.ac_connected)
+      ? dict.batteryCharging
+      : dict.batteryDischarging;
+  }
+
+  // 2. Wi-Fi / Network Card
+  const cardNet = document.getElementById("card-network");
+  const txtWifiVal = document.getElementById("txt-wifi-val");
+  const txtWifiSub = document.getElementById("txt-wifi-sub");
+  const wifiTag = document.getElementById("wifi-signal-tag");
+
+  if (cardNet) {
+    cardNet.classList.toggle("connected", state.network.is_connected);
+  }
+
+  if (state.network.is_connected) {
+    if (state.network.connection_type === "wifi") {
+      if (txtWifiVal) txtWifiVal.textContent = state.network.ssid || "Wi-Fi";
+      if (txtWifiSub) txtWifiSub.textContent = dict.wifiConnected;
+      if (wifiTag) {
+        wifiTag.style.display = "inline-block";
+        if (state.network.signal_percent) {
+          wifiTag.textContent = `${state.network.signal_percent}%`;
+        }
+      }
+    } else {
+      if (txtWifiVal) txtWifiVal.textContent = "Ethernet";
+      if (txtWifiSub) txtWifiSub.textContent = dict.wifiConnected;
+      if (wifiTag) wifiTag.style.display = "none";
+    }
+  } else {
+    if (txtWifiVal) txtWifiVal.textContent = dict.wifiDisconnected;
+    if (txtWifiSub) txtWifiSub.textContent = "No Internet";
+    if (wifiTag) wifiTag.style.display = "none";
+  }
+
+  // 3. Bluetooth Card
+  const cardBt = document.getElementById("card-bluetooth");
+  const txtBtVal = document.getElementById("txt-bt-val");
+  const txtBtSub = document.getElementById("txt-bt-sub");
+
+  const connectedList = state.bluetooth.devices.filter((d) => d.connected);
+  if (cardBt) {
+    cardBt.classList.toggle("active", connectedList.length > 0);
+  }
+
+  if (connectedList.length > 0) {
+    const first = connectedList[0].name;
+    if (txtBtVal) {
+      txtBtVal.textContent = connectedList.length === 1 ? first : `${first} (+${connectedList.length - 1})`;
+    }
+    if (txtBtSub) {
+      txtBtSub.textContent = `${connectedList.length} ${dict.bluetoothConnectedDevices}`;
+    }
+  } else {
+    if (txtBtVal) txtBtVal.textContent = dict.bluetoothReady;
+    if (txtBtSub) txtBtSub.textContent = dict.bluetoothNoDevices;
+  }
+
+  // 4. Primary Audio Chip
+  const audioChip = document.getElementById("device-audio-chip");
+  const txtAudioName = document.getElementById("txt-audio-name");
+  if (state.primary_audio_output && state.primary_audio_output.length > 0) {
+    if (audioChip) audioChip.style.display = "inline-flex";
+    if (txtAudioName) txtAudioName.textContent = state.primary_audio_output;
+  }
+}
+
+async function initDeviceMonitor(): Promise<void> {
+  // Pill alert banner click -> expand island and jump to Devices tab
+  const pill = document.getElementById("pill-device-alert");
+  pill?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfx.playClick();
+    expandIsland();
+    setSlide(1);
+    pill.classList.remove("show");
+  });
+
+  // Windows Settings shortcut links on cards
+  document.getElementById("card-battery")?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    sfx.playClick();
+    try {
+      await invoke("open_battery_settings");
+    } catch (_) {}
+  });
+
+  document.getElementById("card-network")?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    sfx.playClick();
+    try {
+      await invoke("open_wifi_settings");
+    } catch (_) {}
+  });
+
+  document.getElementById("card-bluetooth")?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    sfx.playClick();
+    try {
+      await invoke("open_bluetooth_settings");
+    } catch (_) {}
+  });
+
+  // Action buttons
+  document.getElementById("btn-refresh-devices")?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    sfx.playPop();
+    const btn = document.getElementById("btn-refresh-devices");
+    btn?.classList.add("rotating");
+    setTimeout(() => btn?.classList.remove("rotating"), 800);
+    try {
+      const state = await invoke<DeviceStatePayload>("get_device_state");
+      if (state) updateDeviceUI(state);
+    } catch (err) {
+      console.warn("Refresh devices error:", err);
+    }
+  });
+
+  document.getElementById("btn-test-alert")?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    try {
+      await invoke("trigger_test_alert");
+    } catch (err) {
+      console.warn("Trigger test alert error:", err);
+    }
+  });
+
+  // Listen to Rust background events
+  listen<DeviceStatePayload>("device-state-changed", (event) => {
+    if (event.payload) {
+      updateDeviceUI(event.payload);
+    }
+  });
+
+  listen<DeviceAlertPayload>("device-alert", (event) => {
+    if (event.payload) {
+      showDeviceAlert(event.payload);
+    }
+  });
+
+  // Fetch initial device state
+  try {
+    const initialState = await invoke<DeviceStatePayload>("get_device_state");
+    if (initialState) {
+      updateDeviceUI(initialState);
+    }
+  } catch (err) {
+    console.warn("Failed to fetch initial device state:", err);
+  }
+}
