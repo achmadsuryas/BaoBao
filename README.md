@@ -34,23 +34,16 @@ BaoBao dapat mengecil menjadi kapsul pil mini yang tenang atau melebar (*expand*
 - **Audio Controls & Sound Wave**: Tombol Play/Pause, Next, Previous, slider volume terintegrasi, dan visualizer audio soundwave yang hidup.
 - **Sleepy BaoBao (Idle State)**: Saat musik tidak diputar lebih dari beberapa saat, maskot BaoBao akan tertidur pulas lengkap dengan animasi awan `zZz` yang menggemaskan.
 
-### 🔋 2. Deteksi Perangkat & Hardware Terhubung (Devices)
-- **Status Baterai & Daya**: Menampilkan persentase baterai secara real-time, status pengisian daya (*charging*), serta indikator peringatan daya rendah.
-- **Deteksi Wi-Fi & Jaringan**: Mengetahui nama SSID Wi-Fi yang aktif beserta kekuatan sinyal, atau status koneksi kabel LAN/Ethernet.
-- **Koneksi Bluetooth**: Mendeteksi perangkat periferal seperti headphone, keyboard, mouse, maupun ponsel yang sedang terhubung ke laptop/PC.
-- **Animasi Dynamic Island Pop-up**: Muncul animasi bubble mengambang di atas pulau dan efek riak (*ripple*) pada kartu perangkat seketika saat charger dicolokkan atau headphone Bluetooth terhubung, disertai suara *crystal chime*.
-- **Akses Cepat Pengaturan Windows**: Klik pada kartu untuk langsung membuka jendela pengaturan Windows yang bersangkutan secara instan.
-
-### 🗄️ 3. Shelf (Desktop Stash & Quick Launcher)
+### 🗄️ 2. Shelf (Desktop Stash & Quick Launcher)
 - **Drag & Drop Tray**: Tarik dan lepaskan (*drag & drop*) file, folder, dokumen, atau shortcut aplikasi langsung ke pulau untuk disimpan sementara.
 - **Dual Display Mode**: Pilihan tampilan **Slider View** (scroll horizontal modern) atau **Grid View** (tata letak rapi ke bawah).
 - Desktop Anda tetap bersih dan rapi tanpa berserakan file sementara!
 
-### 📝 4. Catatan Cepat & To-Do (Notes)
+### 📝 3. Catatan Cepat & To-Do (Notes)
 - Buat catatan ide spontan atau daftar tugas (*to-do list*) tanpa membuka aplikasi berat.
 - Dilengkapi penanggalan otomatis, fitur tenggat waktu (*due date picker*), dan penanda selesai (*checklist complete*).
 
-### 🎨 5. Kustomisasi Tema & Pengaturan
+### 🎨 4. Kustomisasi Tema & Pengaturan
 - **6 Pilihan Tema Warna**:
   - 🔘 *Slate Gray* (Elegan & Netral)
   - 🌸 *Sakura Pink* (Lembut & Ceria)
