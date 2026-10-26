@@ -600,6 +600,9 @@ function cleanItemDisplayName(rawName: string): string {
   if (rawName.toLowerCase().endsWith(".url")) {
     return rawName.slice(0, -4);
   }
+  if (rawName.toLowerCase().endsWith(".app")) {
+    return rawName.slice(0, -4);
+  }
   return rawName;
 }
 
