@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/Tauri-v2-FFC131?style=for-the-badge&logo=tauri&logoColor=black" alt="Tauri" />
   <img src="https://img.shields.io/badge/Rust-Backend-dea584?style=for-the-badge&logo=rust&logoColor=black" alt="Rust" />
   <img src="https://img.shields.io/badge/TypeScript-Frontend-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Version-0.1.0-emerald?style=for-the-badge" alt="Version" />
+  <img src="https://img.shields.io/badge/Version-0.1.1-emerald?style=for-the-badge" alt="Version" />
 </p>
 
 ---
@@ -72,13 +72,13 @@ BaoBao dapat mengecil menjadi kapsul pil mini yang tenang atau melebar (*expand*
 Anda dapat langsung mengunduh file installer resmi BaoBao melalui tombol direct download berikut:
 
 <p align="center">
-  <a href="https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64-setup.exe">
+  <a href="https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.1_x64-setup.exe">
     <img src="https://img.shields.io/badge/Download-Windows%20Setup%20(.exe)-2ea44f?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows Installer .exe" />
   </a>
-  <a href="https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_aarch64.dmg">
+  <a href="https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.1_aarch64.dmg">
     <img src="https://img.shields.io/badge/Download-macOS%20Disk%20Image%20(.dmg)-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download macOS DMG" />
   </a>
-  <a href="https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64_en-US.msi">
+  <a href="https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.1_x64_en-US.msi">
     <img src="https://img.shields.io/badge/Download-Windows%20Package%20(.msi)-0969da?style=for-the-badge&logo=windows&logoColor=white" alt="Download MSI" />
   </a>
 </p>
@@ -87,22 +87,22 @@ Anda dapat langsung mengunduh file installer resmi BaoBao melalui tombol direct 
 
 | File | Sistem Operasi | Tipe | Link Unduh Langsung | Keterangan & Rekomendasi |
 | :--- | :--- | :--- | :--- | :--- |
-| **`BaoBao_0.1.0_x64-setup.exe`** | Windows 10/11 | **NSIS Setup** | [⬇️ **Download .exe**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64-setup.exe) | ✨ **Paling Direkomendasikan untuk Windows.** Installer otomatis, membuat shortcut di Desktop dan Start Menu secara instan. |
-| **`BaoBao_0.1.0_aarch64.dmg`** | macOS | **Apple Disk Image** | [⬇️ **Download .dmg**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_aarch64.dmg) | 🍏 **Paling Direkomendasikan untuk macOS.** Drag & drop langsung ke folder `Applications`. |
-| **`BaoBao_0.1.0_x64_en-US.msi`** | Windows 10/11 | **MSI Package** | [⬇️ **Download .msi**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64_en-US.msi) | Paket instalasi standar MSI untuk Windows. |
+| **`BaoBao_0.1.1_x64-setup.exe`** | Windows 10/11 | **NSIS Setup** | [⬇️ **Download .exe**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.1_x64-setup.exe) | ✨ **Paling Direkomendasikan untuk Windows.** Installer otomatis, membuat shortcut di Desktop dan Start Menu secara instan. |
+| **`BaoBao_0.1.1_aarch64.dmg`** | macOS | **Apple Disk Image** | [⬇️ **Download .dmg**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.1_aarch64.dmg) | 🍏 **Paling Direkomendasikan untuk macOS.** Drag & drop langsung ke folder `Applications`. |
+| **`BaoBao_0.1.1_x64_en-US.msi`** | Windows 10/11 | **MSI Package** | [⬇️ **Download .msi**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.1_x64_en-US.msi) | Paket instalasi standar MSI untuk Windows. |
 
 ---
 
 ### 🚀 Cara Mengunduh & Memasang:
 
 #### Untuk Windows:
-1. Unduh `BaoBao_0.1.0_x64-setup.exe`.
+1. Unduh `BaoBao_0.1.1_x64-setup.exe`.
 2. Buka file installer untuk memulai instalasi.
 3. Jika muncul notifikasi proteksi *Windows SmartScreen* (*"Windows protected your PC"*): Klik **"More info"** -> Klik **"Run anyway"**.
 4. Selesai!
 
 #### Untuk macOS:
-1. Unduh `BaoBao_0.1.0_aarch64.dmg` (atau versi Intel jika menggunakan Mac model lama).
+1. Unduh `BaoBao_0.1.1_aarch64.dmg` (atau versi Intel jika menggunakan Mac model lama).
 2. Buka file `.dmg` yang diunduh, lalu seret ikon **BaoBao** ke folder **Applications**.
 3. Saat pertama kali dibuka di macOS, jika aplikasi terblokir oleh Gatekeeper (*"BaoBao is damaged and can't be opened"* atau *"unidentified developer"*):
    - Buka **Terminal** di Mac Anda, lalu jalankan perintah berikut:
