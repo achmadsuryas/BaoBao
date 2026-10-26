@@ -420,7 +420,7 @@ function applyStyleTheme(style: StyleTheme): void {
 // Multi-Language Support (i18n)
 // ============================================
 
-type Lang = "en" | "id" | "ja";
+type Lang = "en" | "id" | "ja" | "zh";
 
 const I18N: Record<Lang, Record<string, string>> = {
   en: {
@@ -671,6 +671,89 @@ const I18N: Record<Lang, Record<string, string>> = {
     tooltipMarkComplete: "完了にする",
     tooltipMarkIncomplete: "未完了にする",
     tooltipCloseEditor: "エディタを閉じる",
+  },
+  zh: {
+    sfxTitle: "音效 (SFX)",
+    sfxDesc: "UI 点击操作音效",
+    miniLyricsTitle: "迷你胶囊歌词",
+    miniLyricsDesc: "最小化时显示歌词",
+    langTitle: "语言",
+    themeTitle: "颜色",
+    colorTitle: "颜色",
+    styleThemeTitle: "主题",
+    themeDefault: "默认",
+    themeSakura: "樱花",
+    themeMountain: "山岳",
+    themeColor: "纯色",
+    themeOpacityLabel: "透明度",
+    animSpeedTitle: "动画速度",
+    animSpeedDesc: "悬停与展开速度",
+    resetAllTitle: "重置设置",
+    resetAllDesc: "恢复所有默认值",
+    resetAllBtn: "重置",
+    resetConfirmTitle: "重置所有设置？",
+    resetConfirmDesc: "所有颜色、主题、快捷键、动画速度和窗口位置都将恢复为默认设置。确定要重置吗？",
+    btnCancel: "取消",
+    btnConfirmReset: "确认重置",
+    shortcutTitle: "显示/隐藏快捷键",
+    shortcutDesc: "键盘快捷键切换",
+    shortcutRecording: "按下按键...",
+    shelfTitle: "暂存架",
+    shelfDropTitle: "拖放文件到此处",
+    shelfDropSubtitle: "拖放文件 / 文件夹 / 应用快速暂存",
+    waitingMusic: "等待音乐播放...",
+    playAnySong: "播放任意音乐即可开始",
+    noLyrics: "暂无歌词",
+    loadingLyrics: "正在加载歌词...",
+    autostartTitle: "开机自启",
+    autostartDesc: "电脑开机时自动运行",
+    monitorTitle: "显示器",
+    monitorDesc: "切换显示屏",
+    positionTitle: "窗口位置",
+    positionDesc: "左右拖拽调整",
+    btnResetCenter: "居中重置",
+    langDesc: "界面显示语言",
+    appFooter: "BaoBao v0.1.0",
+    settingsCategory: "设置",
+    notesTitle: "便签",
+    notesCountLabel: "条便签",
+    notesBtnNew: "新建",
+    notesBtnSave: "保存",
+    notesEmpty: "暂无便签，点击“新建”添加！",
+    untitledNote: "无标题便签",
+    notesTitlePlaceholder: "便签标题...",
+    notesBodyPlaceholder: "在这里输入详细内容...",
+    notesCreatedPlaceholder: "创建日期...",
+    notesDuePlaceholder: "无截止时间",
+    tooltipSettings: "设置",
+    tooltipPin: "保持窗口常开",
+    tooltipPrevView: "上一个视图",
+    tooltipNextView: "下一个视图",
+    tooltipToggleLyrics: "显示/隐藏歌词",
+    tooltipPrevTrack: "上一首",
+    tooltipPlayPause: "播放 / 暂停",
+    tooltipNextTrack: "下一首",
+    tooltipVolume: "音量调节（滚轮调节）",
+    tooltipMute: "静音 / 取消静音",
+    tooltipFullLyrics: "完整歌词",
+    tooltipCloseLyrics: "关闭歌词",
+    tooltipClearAll: "清空全部内容",
+    tooltipSliderView: "横向滑动视图",
+    tooltipGridView: "网格列表视图",
+    tooltipNewNote: "新建便签",
+    tooltipDeleteNote: "删除便签",
+    tooltipSaveNote: "保存便签",
+    tooltipCreatedDate: "创建时间",
+    tooltipDueDate: "截止时间",
+    tooltipVisualizer: "音频可视化",
+    tooltipBaobao: "BaoBao",
+    tooltipDotMusic: "音乐",
+    tooltipDotShelf: "暂存架",
+    tooltipDotNotes: "便签",
+    tooltipDotSettings: "设置",
+    tooltipMarkComplete: "标记为已完成",
+    tooltipMarkIncomplete: "标记为未完成",
+    tooltipCloseEditor: "关闭编辑器",
   },
 };
 
@@ -1262,6 +1345,7 @@ const MONTH_NAMES: Record<Lang, string[]> = {
   en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
   id: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"],
   ja: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+  zh: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
 };
 
 function formatDateTime(d: Date = new Date(), lang: Lang = currentLang): string {
@@ -1271,7 +1355,7 @@ function formatDateTime(d: Date = new Date(), lang: Lang = currentLang): string 
   const hours = String(d.getHours()).padStart(2, "0");
   const mins = String(d.getMinutes()).padStart(2, "0");
 
-  if (lang === "ja") {
+  if (lang === "ja" || lang === "zh") {
     return `${year}年${m + 1}月${day}日 ${hours}:${mins}`;
   }
   const months = MONTH_NAMES[lang] || MONTH_NAMES.en;
@@ -1283,7 +1367,7 @@ function formatDateOnly(d: Date, lang: Lang = currentLang): string {
   const m = d.getMonth();
   const year = d.getFullYear();
 
-  if (lang === "ja") {
+  if (lang === "ja" || lang === "zh") {
     return `${year}年${m + 1}月${day}日`;
   }
   const months = MONTH_NAMES[lang] || MONTH_NAMES.en;

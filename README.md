@@ -5,7 +5,7 @@
 <h1 align="center">BaoBao (宝宝) 🥟</h1>
 
 <p align="center">
-  <b>Dynamic Island Desktop Widget yang Imut, Ringan, dan Produktif untuk Windows & macOS (MacBook)</b><br>
+  <b>Dynamic Island Desktop Widget yang Imut, Ringan, dan Produktif untuk Windows & macOS</b><br>
   <i>A cute, sleek & minimalist floating desktop companion powered by Tauri & Rust.</i>
 </p>
 
@@ -21,7 +21,7 @@
 
 ## 📖 Apa itu BaoBao?
 
-**BaoBao (宝宝)** adalah aplikasi *desktop widget* mengambang yang terinspirasi dari konsep **Dynamic Island**, dirancang khusus untuk mempercantik desktop Anda sekaligus meningkatkan produktivitas harian baik di **Windows** maupun **macOS** (MacBook M-series & Intel). 
+**BaoBao (宝宝)** adalah aplikasi *desktop widget* mengambang yang terinspirasi dari konsep **Dynamic Island**, dirancang khusus untuk mempercantik desktop Anda sekaligus meningkatkan produktivitas harian baik di **Windows** maupun **macOS**.
 
 BaoBao dapat mengecil menjadi kapsul pil mini yang tenang atau melebar (*expand*) menjadi pusat kendali multifungsi hanya dengan satu klik atau hover.
 
@@ -43,18 +43,27 @@ BaoBao dapat mengecil menjadi kapsul pil mini yang tenang atau melebar (*expand*
 - Buat catatan ide spontan atau daftar tugas (*to-do list*) tanpa membuka aplikasi berat.
 - Dilengkapi penanggalan otomatis, fitur tenggat waktu (*due date picker*), dan penanda selesai (*checklist complete*).
 
-### 🎨 4. Kustomisasi Tema & Pengaturan
-- **6 Pilihan Tema Warna**:
+### 🎨 4. Kustomisasi Tema, Warna, & Animasi
+- **Pilihan Warna Aksen (Color)**:
   - 🔘 *Slate Gray* (Elegan & Netral)
   - 🌸 *Sakura Pink* (Lembut & Ceria)
   - 💎 *Neon Cyan* (Futuristik & Modern)
   - 🍃 *Emerald Green* (Segar & Sejuk)
   - 🌅 *Sunset Amber* (Hangat & Menawan)
   - ☀️ *Solar Gold* (Mewah & Berenergi)
-- **Multi-Bahasa**: Dukungan Bahasa Indonesia, English, dan 日本語 (Japanese).
-- **Audio SFX**: Efek suara interaktif saat tombol ditekan (dapat dimatikan sesuai selera).
+  - 🎨 *Custom Color Picker & Eyedropper Pipette*: Bebas memilih kode warna HEX apa saja melalui dialog palet warna atau mengambil warna langsung dari layar desktop dengan pipet.
+- **Pilihan Tema Latar (Theme)**:
+  - 🪟 *Default*: Tampilan kaca minimalis modern (*glassmorphism*).
+  - 🌸 *Sakura*: Nuansa dahan bunga Sakura Jepang dengan aksen lembut.
+  - 🏔️ *Mountain*: Pemandangan siluet pegunungan Jepang yang menenangkan.
+  - 🎨 *Color*: Kustom warna background pulau sesuka hati menggunakan color picker & eyedropper.
+  - 🎚️ *Artwork Opacity*: Atur transparansi gambar latar belakang sesuai kenyamanan mata.
+- **Slider Durasi Animasi (Speed)**: Sesuaikan kecepatan animasi buka/tutup dan pergantian tab (*hover speed*) dari 0.15s hingga 0.90s.
+- **Multi-Bahasa**: Dukungan Bahasa Indonesia, English, 日本語 (Japanese), dan 中文 (Chinese).
+- **Audio SFX**: Efek suara interaktif saat tombol ditekan (dapat diaktifkan/dinonaktifkan).
 - **Start on Boot**: Opsi untuk otomatis berjalan saat PC/laptop Anda pertama kali dinyalakan.
-- **Pin Island**: Sematkan pulau agar tetap terbuka saat Anda sedang bekerja secara aktif.
+- **Shortcut Keyboard Global**: Sembunyikan atau tampilkan BaoBao secara instan dengan satu tombol (default tombol `` ` ``).
+- **Reset Settings Modal**: Kembalikan semua pengaturan ke setelan pabrik kapan saja dengan dialog konfirmasi yang aman.
 
 ---
 
@@ -79,7 +88,7 @@ Anda dapat langsung mengunduh file installer resmi BaoBao melalui tombol direct 
 | File | Sistem Operasi | Tipe | Link Unduh Langsung | Keterangan & Rekomendasi |
 | :--- | :--- | :--- | :--- | :--- |
 | **`BaoBao_0.1.0_x64-setup.exe`** | Windows 10/11 | **NSIS Setup** | [⬇️ **Download .exe**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64-setup.exe) | ✨ **Paling Direkomendasikan untuk Windows.** Installer otomatis, membuat shortcut di Desktop dan Start Menu secara instan. |
-| **`BaoBao_0.1.0_aarch64.dmg`** | macOS (Apple Silicon M1/M2/M3/M4) | **Apple Disk Image** | [⬇️ **Download .dmg**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_aarch64.dmg) | 🍏 **Paling Direkomendasikan untuk MacBook/Mac.** Drag & drop langsung ke folder `Applications`. |
+| **`BaoBao_0.1.0_aarch64.dmg`** | macOS | **Apple Disk Image** | [⬇️ **Download .dmg**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_aarch64.dmg) | 🍏 **Paling Direkomendasikan untuk macOS.** Drag & drop langsung ke folder `Applications`. |
 | **`BaoBao_0.1.0_x64_en-US.msi`** | Windows 10/11 | **MSI Package** | [⬇️ **Download .msi**](https://github.com/achmadsuryas/BaoBao-Release/releases/latest/download/BaoBao_0.1.0_x64_en-US.msi) | Paket instalasi standar MSI untuk Windows. |
 
 ---
@@ -92,54 +101,31 @@ Anda dapat langsung mengunduh file installer resmi BaoBao melalui tombol direct 
 3. Jika muncul notifikasi proteksi *Windows SmartScreen* (*"Windows protected your PC"*): Klik **"More info"** -> Klik **"Run anyway"**.
 4. Selesai!
 
-#### Untuk macOS (MacBook / iMac / Mac Mini):
+#### Untuk macOS:
 1. Unduh `BaoBao_0.1.0_aarch64.dmg` (atau versi Intel jika menggunakan Mac model lama).
 2. Buka file `.dmg` yang diunduh, lalu seret ikon **BaoBao** ke folder **Applications**.
-3. Saat pertama kali dibuka di macOS, jika muncul peringatan Gatekeeper: Buka **System Settings** -> **Privacy & Security** -> Klik **Open Anyway** pada BaoBao.
+3. Saat pertama kali dibuka di macOS, jika aplikasi terblokir oleh Gatekeeper (*"BaoBao is damaged and can't be opened"* atau *"unidentified developer"*):
+   - Buka **Terminal** di Mac Anda, lalu jalankan perintah berikut:
+     ```bash
+     xattr -cr /Applications/BaoBao.app
+     ```
+     *(atau `sudo xattr -rd com.apple.quarantine /Applications/BaoBao.app`)*
+   - Atau buka **System Settings** -> **Privacy & Security** -> gulir ke bawah dan klik **Open Anyway** pada BaoBao.
 4. Nikmati kehadiran BaoBao di desktop Mac Anda! 🥟🎉
 
 ---
 
 ## 🎮 Cara Menggunakan BaoBao
 
-- **Buka / Tutup Pulau**: Klik atau arahkan kursor ke kapsul pil untuk membuka kontrol lengkap. Klik di luar atau tombol close untuk mengembalikannya ke bentuk mini.
+- **Buka / Tutup Pulau**: Klik atau arahkan kursor ke kapsul pil untuk membuka kontrol lengkap. Klik di luar atau tekan tombol shortcut untuk menyembunyikannya.
 - **Memindahkan Posisi**: Tahan klik kiri pada header / area kosong widget, lalu geser ke posisi mana pun di monitor Anda.
-- **Sematkan Terbuka (Pin)**: Tekan ikon jarum/pin 📌 di pojok kanan atas agar pulau tidak otomatis menutup.
+- **Sematkan Terbuka (Pin)**: Tekan ikon jarum/pin 📌 di pojok kanan atas agar pulau tidak otomatis menutup saat kursor keluar.
 - **Navigasi Tab**: Gunakan tombol panah `‹` dan `›` atau titik indikator di bawah untuk berganti antara **Musik**, **Shelf**, **Catatan**, dan **Pengaturan**.
-
----
-
-## 🛠️ Build dari Source Code (Developer)
-
-Jika Anda ingin berkontribusi atau mengompilasi sendiri aplikasi ini dari sumber:
-
-### Prasyarat
-- [Node.js](https://nodejs.org/) (versi 18+)
-- [Rust & Cargo](https://www.rust-lang.org/)
-- Visual Studio C++ Build Tools
-
-### Langkah Build
-
-```bash
-# 1. Clone repositori
-git clone https://github.com/achmadsuryas/BaoBao.git
-cd BaoBao
-
-# 2. Pasang dependensi frontend
-npm install
-
-# 3. Jalankan dalam mode pengembangan
-npm run tauri dev
-
-# 4. Bangun paket installer produksi (.exe dan .msi)
-npm run tauri build
-```
-
-Hasil kompilasi akan berada di folder `src-tauri/target/release/bundle/`.
 
 ---
 
 ## 👤 Pembuat & Lisensi
 
 Dibuat dengan ❤️ oleh **[Achmad Surya](https://github.com/achmadsuryas)**.  
+Terinspirasi dari proyek open-source hebat: **[coucou](https://github.com/louis-cfm/coucou)** oleh **[louis-cfm](https://github.com/louis-cfm)**.  
 Hak Cipta © 2026 Achmad Surya. All rights reserved.
