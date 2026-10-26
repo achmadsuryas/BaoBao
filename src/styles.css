@@ -1597,13 +1597,15 @@ body.is-dragging-island * {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   padding: 3px 6px;
   background: transparent;
   border: none;
   border-radius: 8px;
   transition: background 0.2s ease;
   flex-shrink: 0;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .settings-item:hover {
@@ -1616,6 +1618,7 @@ body.is-dragging-island * {
   gap: 8px;
   min-width: 0;
   flex: 1;
+  overflow: hidden;
 }
 
 .settings-icon {
@@ -1634,21 +1637,29 @@ body.is-dragging-island * {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .settings-label {
+  display: block;
   font-size: 11.5px;
   font-weight: 600;
   color: #ffffff;
   line-height: 1.2;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .settings-desc {
+  display: block;
   font-size: 9.5px;
   color: rgba(255, 255, 255, 0.5);
   line-height: 1.2;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* iOS Style Micro Toggle Switch */
@@ -1756,13 +1767,15 @@ body.is-dragging-island * {
   color: #ffffff;
   font-size: 10.5px;
   font-weight: 600;
-  padding: 3px 10px;
+  padding: 3px 8px;
   cursor: pointer;
   outline: none;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .btn-setting-action:hover {
