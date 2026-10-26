@@ -239,17 +239,33 @@ function applyTheme(themeKey: string): void {
   localStorage.setItem("baobao_theme", themeKey);
 }
 
-type StyleTheme = "default" | "sakura";
+type StyleTheme = "default" | "sakura" | "mountain";
 let currentStyleTheme: StyleTheme = (localStorage.getItem("baobao_style_theme") as StyleTheme) || "default";
+
+let currentThemeOpacity = parseInt(localStorage.getItem("baobao_theme_opacity") || "25", 10);
+if (isNaN(currentThemeOpacity)) currentThemeOpacity = 25;
+
+function applyThemeOpacity(val: number): void {
+  currentThemeOpacity = val;
+  document.documentElement.style.setProperty("--theme-decor-opacity", (val / 100).toString());
+  const valEl = document.getElementById("txt-theme-opacity-val");
+  if (valEl) valEl.textContent = `${val}%`;
+  const slider = document.getElementById("slider-theme-opacity") as HTMLInputElement | null;
+  if (slider && parseInt(slider.value, 10) !== val) {
+    slider.value = val.toString();
+  }
+  localStorage.setItem("baobao_theme_opacity", val.toString());
+}
 
 function applyStyleTheme(style: StyleTheme): void {
   currentStyleTheme = style;
   const island = document.getElementById("island");
   if (island) {
+    island.classList.remove("theme-sakura", "theme-mountain");
     if (style === "sakura") {
       island.classList.add("theme-sakura");
-    } else {
-      island.classList.remove("theme-sakura");
+    } else if (style === "mountain") {
+      island.classList.add("theme-mountain");
     }
   }
 
@@ -261,6 +277,15 @@ function applyStyleTheme(style: StyleTheme): void {
       el.classList.remove("active");
     }
   });
+
+  const opacityCtrl = document.getElementById("theme-opacity-control");
+  if (opacityCtrl) {
+    if (style === "default") {
+      opacityCtrl.classList.add("disabled");
+    } else {
+      opacityCtrl.classList.remove("disabled");
+    }
+  }
 
   localStorage.setItem("baobao_style_theme", style);
 }
@@ -282,7 +307,9 @@ const I18N: Record<Lang, Record<string, string>> = {
     colorTitle: "Color",
     styleThemeTitle: "Theme",
     themeDefault: "Default",
-    themeSakura: "Sakura (桜)",
+    themeSakura: "Sakura",
+    themeMountain: "Mountain",
+    themeOpacityLabel: "Opacity",
     shelfTitle: "Shelf",
     shelfDropTitle: "Drop files here",
     shelfDropSubtitle: "Drag files / folders / apps to stash",
@@ -350,7 +377,9 @@ const I18N: Record<Lang, Record<string, string>> = {
     colorTitle: "Warna",
     styleThemeTitle: "Tema",
     themeDefault: "Standar",
-    themeSakura: "Sakura (桜)",
+    themeSakura: "Sakura",
+    themeMountain: "Gunung",
+    themeOpacityLabel: "Transparansi",
     shelfTitle: "Shelf",
     shelfDropTitle: "Letakkan file di sini",
     shelfDropSubtitle: "Tarik file / folder / aplikasi ke sini",
@@ -418,7 +447,9 @@ const I18N: Record<Lang, Record<string, string>> = {
     colorTitle: "カラー",
     styleThemeTitle: "テーマ",
     themeDefault: "標準",
-    themeSakura: "桜 (Sakura)",
+    themeSakura: "桜",
+    themeMountain: "山",
+    themeOpacityLabel: "透明度",
     shelfTitle: "シェルフ",
     shelfDropTitle: "ファイルをここにドロップ",
     shelfDropSubtitle: "ファイル・フォルダ・アプリを保管",
@@ -552,6 +583,10 @@ function applyLanguage(lang: Lang): void {
   if (txtThemeDefault) txtThemeDefault.textContent = dict.themeDefault;
   const txtThemeSakura = document.getElementById("txt-theme-sakura");
   if (txtThemeSakura) txtThemeSakura.textContent = dict.themeSakura;
+  const txtThemeMountain = document.getElementById("txt-theme-mountain");
+  if (txtThemeMountain) txtThemeMountain.textContent = dict.themeMountain;
+  const txtThemeOpacityLabel = document.getElementById("txt-theme-opacity-label");
+  if (txtThemeOpacityLabel) txtThemeOpacityLabel.textContent = dict.themeOpacityLabel;
 
   const autostartLabel = document.getElementById("txt-autostart-label");
   if (autostartLabel) autostartLabel.textContent = dict.autostartTitle;
@@ -2321,6 +2356,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const savedTheme = localStorage.getItem("baobao_theme") || "gray";
   applyTheme(savedTheme);
 
+  applyThemeOpacity(currentThemeOpacity);
   applyStyleTheme(currentStyleTheme);
 
   applyLanguage((localStorage.getItem("baobao_lang") as Lang) || "en");
@@ -2393,10 +2429,24 @@ window.addEventListener("DOMContentLoaded", async () => {
           if (currentTheme === "gray") {
             applyTheme("pink");
           }
+        } else if (styleKey === "mountain") {
+          const currentTheme = localStorage.getItem("baobao_theme") || "gray";
+          if (currentTheme === "gray") {
+            applyTheme("emerald");
+          }
         }
       }
     });
   });
+
+  const sliderOpacity = document.getElementById("slider-theme-opacity") as HTMLInputElement | null;
+  if (sliderOpacity) {
+    sliderOpacity.value = currentThemeOpacity.toString();
+    sliderOpacity.addEventListener("input", () => {
+      const val = parseInt(sliderOpacity.value, 10);
+      applyThemeOpacity(val);
+    });
+  }
 
   // --- Shelf Stash Initialization & Drag-Drop Listeners ---
   loadShelfItems();
