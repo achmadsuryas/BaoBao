@@ -239,6 +239,32 @@ function applyTheme(themeKey: string): void {
   localStorage.setItem("baobao_theme", themeKey);
 }
 
+type StyleTheme = "default" | "sakura";
+let currentStyleTheme: StyleTheme = (localStorage.getItem("baobao_style_theme") as StyleTheme) || "default";
+
+function applyStyleTheme(style: StyleTheme): void {
+  currentStyleTheme = style;
+  const island = document.getElementById("island");
+  if (island) {
+    if (style === "sakura") {
+      island.classList.add("theme-sakura");
+    } else {
+      island.classList.remove("theme-sakura");
+    }
+  }
+
+  document.querySelectorAll(".style-theme-btn").forEach((btn) => {
+    const el = btn as HTMLElement;
+    if (el.dataset.styleTheme === style) {
+      el.classList.add("active");
+    } else {
+      el.classList.remove("active");
+    }
+  });
+
+  localStorage.setItem("baobao_style_theme", style);
+}
+
 // ============================================
 // Multi-Language Support (i18n)
 // ============================================
@@ -252,7 +278,11 @@ const I18N: Record<Lang, Record<string, string>> = {
     miniLyricsTitle: "Mini Pill Lyrics",
     miniLyricsDesc: "Show when minimized",
     langTitle: "Language",
-    themeTitle: "Color Theme",
+    themeTitle: "Color",
+    colorTitle: "Color",
+    styleThemeTitle: "Theme",
+    themeDefault: "Default",
+    themeSakura: "Sakura (桜)",
     shelfTitle: "Shelf",
     shelfDropTitle: "Drop files here",
     shelfDropSubtitle: "Drag files / folders / apps to stash",
@@ -316,7 +346,11 @@ const I18N: Record<Lang, Record<string, string>> = {
     miniLyricsTitle: "Lirik Mini Pill",
     miniLyricsDesc: "Tampil saat minimize",
     langTitle: "Bahasa",
-    themeTitle: "Tema Warna",
+    themeTitle: "Warna",
+    colorTitle: "Warna",
+    styleThemeTitle: "Tema",
+    themeDefault: "Standar",
+    themeSakura: "Sakura (桜)",
     shelfTitle: "Shelf",
     shelfDropTitle: "Letakkan file di sini",
     shelfDropSubtitle: "Tarik file / folder / aplikasi ke sini",
@@ -380,7 +414,11 @@ const I18N: Record<Lang, Record<string, string>> = {
     miniLyricsTitle: "ミニ歌詞表示",
     miniLyricsDesc: "最小化時に歌詞を表示",
     langTitle: "言語",
-    themeTitle: "カラーテーマ",
+    themeTitle: "カラー",
+    colorTitle: "カラー",
+    styleThemeTitle: "テーマ",
+    themeDefault: "標準",
+    themeSakura: "桜 (Sakura)",
     shelfTitle: "シェルフ",
     shelfDropTitle: "ファイルをここにドロップ",
     shelfDropSubtitle: "ファイル・フォルダ・アプリを保管",
@@ -507,7 +545,13 @@ function applyLanguage(lang: Lang): void {
   if (langDesc) langDesc.textContent = dict.langDesc;
 
   const themeLabel = document.getElementById("txt-theme-label");
-  if (themeLabel) themeLabel.textContent = dict.themeTitle;
+  if (themeLabel) themeLabel.textContent = dict.colorTitle || dict.themeTitle;
+  const styleThemeLabel = document.getElementById("txt-style-theme-label");
+  if (styleThemeLabel) styleThemeLabel.textContent = dict.styleThemeTitle;
+  const txtThemeDefault = document.getElementById("txt-theme-default");
+  if (txtThemeDefault) txtThemeDefault.textContent = dict.themeDefault;
+  const txtThemeSakura = document.getElementById("txt-theme-sakura");
+  if (txtThemeSakura) txtThemeSakura.textContent = dict.themeSakura;
 
   const autostartLabel = document.getElementById("txt-autostart-label");
   if (autostartLabel) autostartLabel.textContent = dict.autostartTitle;
@@ -2277,6 +2321,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   const savedTheme = localStorage.getItem("baobao_theme") || "gray";
   applyTheme(savedTheme);
 
+  applyStyleTheme(currentStyleTheme);
+
   applyLanguage((localStorage.getItem("baobao_lang") as Lang) || "en");
 
   const selectLang = document.getElementById("select-language") as HTMLSelectElement | null;
@@ -2332,6 +2378,23 @@ window.addEventListener("DOMContentLoaded", async () => {
       sfx.playPop();
       const themeKey = (swatch as HTMLElement).dataset.theme || "gray";
       applyTheme(themeKey);
+    });
+  });
+
+  document.querySelectorAll(".style-theme-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sfx.playPop();
+      const styleKey = (btn as HTMLElement).dataset.styleTheme as StyleTheme;
+      if (styleKey) {
+        applyStyleTheme(styleKey);
+        if (styleKey === "sakura") {
+          const currentTheme = localStorage.getItem("baobao_theme") || "gray";
+          if (currentTheme === "gray") {
+            applyTheme("pink");
+          }
+        }
+      }
     });
   });
 
