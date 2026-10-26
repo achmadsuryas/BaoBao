@@ -773,6 +773,79 @@ fn position_top_center(window: &tauri::WebviewWindow) -> Result<(), String> {
     Ok(())
 }
 
+/// Move the window horizontally while keeping Y strictly locked to the top of the current monitor.
+/// `offset_x` is the logical pixel offset from the monitor's horizontal center.
+#[tauri::command]
+fn set_window_horizontal_offset(app: AppHandle, offset_x: f64) -> Result<(), String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+
+    let scale = window.scale_factor().unwrap_or(1.0);
+    let monitor = window
+        .current_monitor()
+        .map_err(|e| e.to_string())?
+        .or_else(|| window.primary_monitor().ok().flatten())
+        .ok_or("No monitor detected")?;
+
+    let monitor_size = monitor.size();
+    let monitor_position = monitor.position();
+    let window_size = window.outer_size().map_err(|e| e.to_string())?;
+
+    let center_x = monitor_position.x + ((monitor_size.width as i32 - window_size.width as i32) / 2);
+    let offset_phys = (offset_x * scale).round() as i32;
+    let mut target_x = center_x + offset_phys;
+
+    // Prevent dragging off screen
+    let min_x = monitor_position.x - (window_size.width as i32 / 2) + 120;
+    let max_x = monitor_position.x + monitor_size.width as i32 - (window_size.width as i32 / 2) - 120;
+    target_x = target_x.clamp(min_x, max_x);
+
+    let y = monitor_position.y; // Strictly locked to top of the screen!
+
+    #[cfg(windows)]
+    {
+        if let Ok(hwnd_val) = window.hwnd() {
+            unsafe extern "system" {
+                fn SetWindowPos(
+                    hwnd: *mut std::ffi::c_void,
+                    hwnd_insert_after: *mut std::ffi::c_void,
+                    x: i32,
+                    y: i32,
+                    cx: i32,
+                    cy: i32,
+                    flags: u32,
+                ) -> i32;
+            }
+            let raw_ptr = hwnd_val.0 as *mut std::ffi::c_void;
+            unsafe {
+                SetWindowPos(
+                    raw_ptr,
+                    std::ptr::null_mut(),
+                    target_x,
+                    y,
+                    window_size.width as i32,
+                    window_size.height as i32,
+                    0x0314, // SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED
+                );
+            }
+            return Ok(());
+        }
+    }
+
+    window
+        .set_position(PhysicalPosition::new(target_x, y))
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+/// Reset the window horizontal position back to exact top-center.
+#[tauri::command]
+fn reset_window_horizontal_offset(app: AppHandle) -> Result<(), String> {
+    set_window_horizontal_offset(app, 0.0)
+}
+
 // ============================================
 // Windows SMTC (System Media Transport Controls)
 // ============================================
@@ -1306,7 +1379,9 @@ pub fn run() {
             get_autostart,
             switch_monitor,
             get_monitors_count,
-            get_current_monitor_label
+            get_current_monitor_label,
+            set_window_horizontal_offset,
+            reset_window_horizontal_offset
         ])
         .setup(|app| {
             println!("[Baobao] Setup starting...");

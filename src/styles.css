@@ -221,6 +221,29 @@ html, body {
   height: 34px;
   width: 100%;
   flex-shrink: 0;
+  cursor: grab;
+}
+
+#island.collapsed {
+  cursor: grab;
+}
+
+.island-header button,
+.island-header .btn-pin-header,
+.island-header .btn-settings-header {
+  cursor: pointer;
+}
+
+body.is-dragging-island,
+body.is-dragging-island * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+#island.is-dragging {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
 }
 
 #island.expanded .island-header {

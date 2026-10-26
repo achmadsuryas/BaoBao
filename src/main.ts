@@ -264,6 +264,9 @@ const I18N: Record<Lang, Record<string, string>> = {
     autostartDesc: "Launch on PC startup",
     monitorTitle: "Display Monitor",
     monitorDesc: "Switch screen",
+    positionTitle: "Horizontal Position",
+    positionDesc: "Drag left/right at screen top",
+    btnResetCenter: "Reset Center",
     langDesc: "Display language",
     appFooter: "BaoBao v0.1.0",
     settingsCategory: "Settings",
@@ -325,6 +328,9 @@ const I18N: Record<Lang, Record<string, string>> = {
     autostartDesc: "Buka saat laptop/PC menyala",
     monitorTitle: "Layar / Monitor",
     monitorDesc: "Ganti monitor",
+    positionTitle: "Posisi Horizontal",
+    positionDesc: "Geser kiri/kanan di atas layar",
+    btnResetCenter: "Reset Tengah",
     langDesc: "Bahasa tampilan",
     appFooter: "BaoBao v0.1.0",
     settingsCategory: "Pengaturan",
@@ -386,6 +392,9 @@ const I18N: Record<Lang, Record<string, string>> = {
     autostartDesc: "PC起動時に自動で開始",
     monitorTitle: "ディスプレイ",
     monitorDesc: "画面切り替え",
+    positionTitle: "水平位置",
+    positionDesc: "画面上部を左右にドラッグ",
+    btnResetCenter: "中央に戻す",
     langDesc: "表示言語",
     appFooter: "BaoBao v0.1.0",
     settingsCategory: "設定",
@@ -509,6 +518,13 @@ function applyLanguage(lang: Lang): void {
   if (monitorLabel) monitorLabel.textContent = dict.monitorTitle;
   const monitorDesc = document.getElementById("txt-monitor-desc");
   if (monitorDesc) monitorDesc.textContent = dict.monitorDesc;
+
+  const posLabel = document.getElementById("txt-position-label");
+  if (posLabel) posLabel.textContent = dict.positionTitle;
+  const posDesc = document.getElementById("txt-position-desc");
+  if (posDesc) posDesc.textContent = dict.positionDesc;
+  const resetPosBtn = document.getElementById("txt-reset-pos-btn");
+  if (resetPosBtn) resetPosBtn.textContent = dict.btnResetCenter;
 
   const shelfDropTitle = document.getElementById("shelf-drop-title");
   if (shelfDropTitle) shelfDropTitle.textContent = dict.shelfDropTitle;
@@ -829,6 +845,16 @@ let lastArtworkQuery = "";
 let lastLyricsQuery = "";
 let lastTrackKey = "";
 let lastPillLyric = "";
+
+// Horizontal Dragging State (Locked to screen top)
+let isDraggingIsland = false;
+let isDragMouseDown = false;
+let dragStartX = 0;
+let dragInitialOffset = 0;
+let hasMovedSignificantly = false;
+let hoverExpandTimer: ReturnType<typeof setTimeout> | null = null;
+let currentOffsetX = parseFloat(localStorage.getItem("baobao_offset_x") || "0");
+if (isNaN(currentOffsetX)) currentOffsetX = 0;
 
 // 3-Minute Idle Track Monitoring
 let lastActiveTrackTime = Date.now();
@@ -1754,6 +1780,7 @@ function updateMediaUI(payload: MediaPayload): void {
 // ============================================
 
 function expandIsland(): void {
+  if (isDraggingIsland) return;
   if (collapseTimeout) {
     clearTimeout(collapseTimeout);
     collapseTimeout = null;
@@ -1774,6 +1801,7 @@ function expandIsland(): void {
 function collapseIsland(): void {
   if (isPinned) return;
   if (isDraggingFile) return;
+  if (isDraggingIsland) return;
   if (collapseTimeout) clearTimeout(collapseTimeout);
 
   collapseTimeout = setTimeout(() => {
@@ -1921,14 +1949,121 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   }, 200);
 
-  // --- Smooth Hover Expand / Collapse on the Island ---
+  // ============================================
+  // Horizontal Dragging & Smooth Hover Controller
+  // ============================================
+  // Apply saved horizontal position on launch
+  if (currentOffsetX !== 0) {
+    invoke("set_window_horizontal_offset", { offsetX: currentOffsetX }).catch(console.error);
+  }
+
   const island = document.getElementById("island");
   if (island) {
-    island.addEventListener("mouseenter", () => {
-      expandIsland();
+    initHorizontalDrag(island);
+  }
+
+  function initHorizontalDrag(islandEl: HTMLElement): void {
+    // Reset Center button in Settings
+    const btnResetPos = document.getElementById("btn-reset-position");
+    if (btnResetPos) {
+      btnResetPos.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        sfx.playPop();
+        currentOffsetX = 0;
+        localStorage.setItem("baobao_offset_x", "0");
+        await invoke("reset_window_horizontal_offset").catch(console.error);
+
+        const txtResetBtn = document.getElementById("txt-reset-pos-btn");
+        if (txtResetBtn) {
+          const orig = txtResetBtn.innerText;
+          txtResetBtn.innerText = "✓ Reset!";
+          setTimeout(() => {
+            txtResetBtn.innerText = orig;
+          }, 1200);
+        }
+      });
+    }
+
+    // Mousedown listener on island
+    islandEl.addEventListener("mousedown", (e: MouseEvent) => {
+      // Only left click
+      if (e.button !== 0) return;
+
+      // Do not initiate drag if user clicked interactive controls
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        target.closest("button, input, textarea, a, .sound-wave, .nav-arrow, .carousel-dots, .mode-btn, .theme-swatch, .select-wrapper")
+      ) {
+        return;
+      }
+
+      isDragMouseDown = true;
+      hasMovedSignificantly = false;
+      dragStartX = e.screenX;
+      dragInitialOffset = currentOffsetX;
+
+      window.addEventListener("mousemove", onWindowMouseMove);
+      window.addEventListener("mouseup", onWindowMouseUp);
     });
 
-    island.addEventListener("mouseleave", () => {
+    function onWindowMouseMove(e: MouseEvent): void {
+      if (!isDragMouseDown) return;
+
+      const deltaX = e.screenX - dragStartX;
+
+      // When moved more than 4px, engage drag mode
+      if (!hasMovedSignificantly && Math.abs(deltaX) > 4) {
+        hasMovedSignificantly = true;
+        isDraggingIsland = true;
+        document.body.classList.add("is-dragging-island");
+        islandEl.classList.add("is-dragging");
+
+        // Cancel any pending hover expansion
+        if (hoverExpandTimer) {
+          clearTimeout(hoverExpandTimer);
+          hoverExpandTimer = null;
+        }
+      }
+
+      if (isDraggingIsland) {
+        currentOffsetX = dragInitialOffset + deltaX;
+        invoke("set_window_horizontal_offset", { offsetX: currentOffsetX }).catch(console.error);
+      }
+    }
+
+    function onWindowMouseUp(): void {
+      window.removeEventListener("mousemove", onWindowMouseMove);
+      window.removeEventListener("mouseup", onWindowMouseUp);
+
+      isDragMouseDown = false;
+
+      if (isDraggingIsland) {
+        isDraggingIsland = false;
+        document.body.classList.remove("is-dragging-island");
+        islandEl.classList.remove("is-dragging");
+        localStorage.setItem("baobao_offset_x", String(currentOffsetX));
+      }
+    }
+
+    // --- Smooth Hover Expand / Collapse on the Island ---
+    islandEl.addEventListener("mouseenter", () => {
+      if (isDraggingIsland || isDragMouseDown) return;
+
+      if (hoverExpandTimer) clearTimeout(hoverExpandTimer);
+      hoverExpandTimer = setTimeout(() => {
+        if (!isDraggingIsland && !isDragMouseDown) {
+          expandIsland();
+        }
+      }, 120);
+    });
+
+    islandEl.addEventListener("mouseleave", () => {
+      if (hoverExpandTimer) {
+        clearTimeout(hoverExpandTimer);
+        hoverExpandTimer = null;
+      }
+      if (isDraggingIsland || isDragMouseDown) return;
       collapseIsland();
     });
   }
