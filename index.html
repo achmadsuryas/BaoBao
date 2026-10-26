@@ -488,6 +488,31 @@
                       <span id="txt-reset-pos-btn">Reset</span>
                     </button>
                   </div>
+
+                  <!-- Hide / Show Keyboard Shortcut Item -->
+                  <div id="settings-item-shortcut" class="settings-item settings-item-compact">
+                    <div class="settings-meta">
+                      <div class="settings-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                          <line x1="6" y1="8" x2="6" y2="8"></line>
+                          <line x1="10" y1="8" x2="10" y2="8"></line>
+                          <line x1="14" y1="8" x2="14" y2="8"></line>
+                          <line x1="18" y1="8" x2="18" y2="8"></line>
+                          <line x1="6" y1="12" x2="6" y2="12"></line>
+                          <line x1="18" y1="12" x2="18" y2="12"></line>
+                          <line x1="10" y1="16" x2="14" y2="16"></line>
+                        </svg>
+                      </div>
+                      <div class="settings-texts">
+                        <span id="txt-shortcut-label" class="settings-label">Hide / Show Key</span>
+                        <span id="txt-shortcut-desc" class="settings-desc">Shortcut keyboard</span>
+                      </div>
+                    </div>
+                    <button id="btn-shortcut-key" class="btn-setting-action btn-shortcut-pill" title="Klik untuk mengganti shortcut keyboard">
+                      <span id="txt-shortcut-key-display">`</span>
+                    </button>
+                  </div>
                 </div>
 
                 <!-- Divider -->
@@ -526,16 +551,16 @@
                   </div>
                   <div class="style-theme-grid">
                     <button class="style-theme-btn active" data-style-theme="default" title="Default Minimal Glass">
-                      <div class="style-theme-preview default-preview"></div>
                       <span id="txt-theme-default">Default</span>
                     </button>
-                    <button class="style-theme-btn" data-style-theme="sakura" title="Japanese Sakura Theme (桜)">
-                      <div class="style-theme-preview sakura-preview"></div>
+                    <button class="style-theme-btn" data-style-theme="sakura" title="Japanese Sakura Theme">
                       <span id="txt-theme-sakura">Sakura</span>
                     </button>
-                    <button class="style-theme-btn" data-style-theme="mountain" title="Japanese Mountain Landscape (山)">
-                      <div class="style-theme-preview mountain-preview"></div>
+                    <button class="style-theme-btn" data-style-theme="mountain" title="Japanese Mountain Landscape">
                       <span id="txt-theme-mountain">Mountain</span>
+                    </button>
+                    <button class="style-theme-btn" data-style-theme="chinese" title="Traditional Chinese Oriental Theme">
+                      <span id="txt-theme-chinese">Chinese</span>
                     </button>
                   </div>
 

@@ -602,6 +602,25 @@ static WITH_LYRICS: AtomicBool = AtomicBool::new(false);
 static WITH_MINI_LYRICS: AtomicBool = AtomicBool::new(false);
 static MINI_WIDTH: AtomicU32 = AtomicU32::new(330);
 static ISLAND_OFFSET_X: AtomicI32 = AtomicI32::new(0);
+static GLOBAL_HOTKEY_VK: AtomicU32 = AtomicU32::new(0xC0); // VK_OEM_3 (` ~)
+static IS_HOTKEY_DOWN: AtomicBool = AtomicBool::new(false);
+
+/// Configure the global shortcut virtual key code (default: 0xC0 for `)
+#[tauri::command]
+fn set_toggle_shortcut(vk_code: u32) {
+    GLOBAL_HOTKEY_VK.store(vk_code, Ordering::Relaxed);
+}
+
+/// Toggle visibility of the main window
+#[tauri::command]
+fn toggle_window_visibility(window: tauri::WebviewWindow) {
+    if window.is_visible().unwrap_or(true) {
+        let _ = window.hide();
+    } else {
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
 
 /// Notify Rust of the current island dimensions and horizontal offset for the click-through hit-test thread
 #[tauri::command]
@@ -1174,6 +1193,7 @@ fn start_cursor_hit_test(window: tauri::WebviewWindow) {
     unsafe extern "system" {
         fn GetCursorPos(lpPoint: *mut POINT) -> i32;
         fn ScreenToClient(hWnd: *mut std::ffi::c_void, lpPoint: *mut POINT) -> i32;
+        fn GetAsyncKeyState(vKey: i32) -> i16;
     }
 
     thread::spawn(move || {
@@ -1186,6 +1206,26 @@ fn start_cursor_hit_test(window: tauri::WebviewWindow) {
 
         loop {
             thread::sleep(Duration::from_millis(25));
+
+            // Check global keyboard shortcut to toggle visibility
+            let vk = GLOBAL_HOTKEY_VK.load(Ordering::Relaxed) as i32;
+            if vk > 0 {
+                let state = unsafe { GetAsyncKeyState(vk) };
+                let is_down = (state as u16 & 0x8000) != 0;
+                let was_down = IS_HOTKEY_DOWN.swap(is_down, Ordering::Relaxed);
+                if is_down && !was_down {
+                    if window.is_visible().unwrap_or(true) {
+                        let _ = window.hide();
+                    } else {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                }
+            }
+
+            if !window.is_visible().unwrap_or(true) {
+                continue;
+            }
 
             let scale = window.scale_factor().unwrap_or(1.0);
             let win_size = window.inner_size().unwrap_or(PhysicalSize::new(960, 260));
@@ -1379,7 +1419,9 @@ pub fn run() {
             get_monitors_count,
             get_current_monitor_label,
             set_window_horizontal_offset,
-            reset_window_horizontal_offset
+            reset_window_horizontal_offset,
+            set_toggle_shortcut,
+            toggle_window_visibility
         ])
         .setup(|app| {
             println!("[Baobao] Setup starting...");

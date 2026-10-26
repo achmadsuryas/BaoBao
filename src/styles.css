@@ -1581,6 +1581,9 @@ body.is-dragging-island * {
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 3px;
+  padding-bottom: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
 
 .settings-col::-webkit-scrollbar {
@@ -1787,6 +1790,34 @@ body.is-dragging-island * {
   color: var(--theme-accent);
 }
 
+.btn-shortcut-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  min-width: 32px;
+  text-align: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-shortcut-pill.recording {
+  background: var(--theme-accent);
+  color: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 10px var(--theme-glow);
+  animation: pulseShortcut 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes pulseShortcut {
+  0% { transform: scale(1); opacity: 0.85; }
+  100% { transform: scale(1.06); opacity: 1; }
+}
+
 .theme-swatches-grid {
   display: flex;
   align-items: center;
@@ -1867,6 +1898,15 @@ body.is-dragging-island * {
   mix-blend-mode: screen;
 }
 
+#island.theme-chinese .island-theme-decor {
+  opacity: var(--theme-decor-opacity, 0.25);
+  background-image: url("/assets/themes/chinese_bg.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  mix-blend-mode: screen;
+}
+
 #island.theme-sakura {
   border-color: rgba(255, 160, 180, 0.28);
 }
@@ -1875,14 +1915,18 @@ body.is-dragging-island * {
   border-color: rgba(52, 211, 153, 0.28);
 }
 
+#island.theme-chinese {
+  border-color: rgba(239, 68, 68, 0.32);
+}
+
 /* ============================================
-   UI Style Theme Selection (Default, Sakura, Mountain)
+   UI Style Theme Selection (Text-Only 2x2 Grid)
    ============================================ */
 
 .style-theme-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
   margin-top: 3px;
   margin-bottom: 6px;
 }
@@ -1891,21 +1935,19 @@ body.is-dragging-island * {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
   padding: 4px 6px;
-  height: 28px;
+  height: 26px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   color: #d4d4d8;
-  font-size: 9.5px;
-  font-weight: 500;
+  font-size: 10px;
+  font-weight: 600;
   cursor: pointer;
   outline: none;
   transition: all 0.2s ease;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .style-theme-btn:hover {
@@ -1919,58 +1961,6 @@ body.is-dragging-island * {
   border-color: var(--theme-accent);
   color: #ffffff;
   box-shadow: 0 0 8px var(--theme-glow);
-}
-
-.style-theme-preview {
-  width: 13px;
-  height: 13px;
-  border-radius: 4px;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-}
-
-.style-theme-preview.default-preview {
-  background: linear-gradient(135deg, #27272a 0%, #09090b 100%);
-  position: relative;
-}
-
-.style-theme-preview.default-preview::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.65);
-}
-
-.style-theme-preview.sakura-preview {
-  background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 50%, #f43f5e 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  line-height: 1;
-}
-
-.style-theme-preview.sakura-preview::after {
-  content: "🌸";
-  font-size: 8px;
-}
-
-.style-theme-preview.mountain-preview {
-  background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0284c7 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  line-height: 1;
-}
-
-.style-theme-preview.mountain-preview::after {
-  content: "⛰️";
-  font-size: 8px;
 }
 
 /* ============================================

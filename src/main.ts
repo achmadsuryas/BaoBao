@@ -239,11 +239,21 @@ function applyTheme(themeKey: string): void {
   localStorage.setItem("baobao_theme", themeKey);
 }
 
-type StyleTheme = "default" | "sakura" | "mountain";
+type StyleTheme = "default" | "sakura" | "mountain" | "chinese";
 let currentStyleTheme: StyleTheme = (localStorage.getItem("baobao_style_theme") as StyleTheme) || "default";
 
 let currentThemeOpacity = parseInt(localStorage.getItem("baobao_theme_opacity") || "25", 10);
 if (isNaN(currentThemeOpacity)) currentThemeOpacity = 25;
+
+let currentShortcutKey = localStorage.getItem("baobao_shortcut_key") || "`";
+let currentShortcutVk = parseInt(localStorage.getItem("baobao_shortcut_vk") || "192", 10);
+if (isNaN(currentShortcutVk)) currentShortcutVk = 192; // VK_OEM_3
+let isRecordingShortcut = false;
+
+function updateShortcutDisplay(): void {
+  const disp = document.getElementById("txt-shortcut-key-display");
+  if (disp) disp.textContent = currentShortcutKey;
+}
 
 function applyThemeOpacity(val: number): void {
   currentThemeOpacity = val;
@@ -261,11 +271,13 @@ function applyStyleTheme(style: StyleTheme): void {
   currentStyleTheme = style;
   const island = document.getElementById("island");
   if (island) {
-    island.classList.remove("theme-sakura", "theme-mountain");
+    island.classList.remove("theme-sakura", "theme-mountain", "theme-chinese");
     if (style === "sakura") {
       island.classList.add("theme-sakura");
     } else if (style === "mountain") {
       island.classList.add("theme-mountain");
+    } else if (style === "chinese") {
+      island.classList.add("theme-chinese");
     }
   }
 
@@ -309,7 +321,11 @@ const I18N: Record<Lang, Record<string, string>> = {
     themeDefault: "Default",
     themeSakura: "Sakura",
     themeMountain: "Mountain",
+    themeChinese: "Chinese",
     themeOpacityLabel: "Opacity",
+    shortcutTitle: "Hide / Show Key",
+    shortcutDesc: "Keyboard toggle",
+    shortcutRecording: "Press key...",
     shelfTitle: "Shelf",
     shelfDropTitle: "Drop files here",
     shelfDropSubtitle: "Drag files / folders / apps to stash",
@@ -379,7 +395,11 @@ const I18N: Record<Lang, Record<string, string>> = {
     themeDefault: "Standar",
     themeSakura: "Sakura",
     themeMountain: "Gunung",
+    themeChinese: "Chinese",
     themeOpacityLabel: "Transparansi",
+    shortcutTitle: "Tombol Hide / Show",
+    shortcutDesc: "Pintasan keyboard",
+    shortcutRecording: "Tekan tombol...",
     shelfTitle: "Shelf",
     shelfDropTitle: "Letakkan file di sini",
     shelfDropSubtitle: "Tarik file / folder / aplikasi ke sini",
@@ -449,7 +469,11 @@ const I18N: Record<Lang, Record<string, string>> = {
     themeDefault: "標準",
     themeSakura: "桜",
     themeMountain: "山",
+    themeChinese: "中国風",
     themeOpacityLabel: "透明度",
+    shortcutTitle: "表示/非表示キー",
+    shortcutDesc: "キーボードショートカット",
+    shortcutRecording: "キーを押す...",
     shelfTitle: "シェルフ",
     shelfDropTitle: "ファイルをここにドロップ",
     shelfDropSubtitle: "ファイル・フォルダ・アプリを保管",
@@ -585,8 +609,15 @@ function applyLanguage(lang: Lang): void {
   if (txtThemeSakura) txtThemeSakura.textContent = dict.themeSakura;
   const txtThemeMountain = document.getElementById("txt-theme-mountain");
   if (txtThemeMountain) txtThemeMountain.textContent = dict.themeMountain;
+  const txtThemeChinese = document.getElementById("txt-theme-chinese");
+  if (txtThemeChinese) txtThemeChinese.textContent = dict.themeChinese;
   const txtThemeOpacityLabel = document.getElementById("txt-theme-opacity-label");
   if (txtThemeOpacityLabel) txtThemeOpacityLabel.textContent = dict.themeOpacityLabel;
+
+  const shortcutLabel = document.getElementById("txt-shortcut-label");
+  if (shortcutLabel) shortcutLabel.textContent = dict.shortcutTitle;
+  const shortcutDesc = document.getElementById("txt-shortcut-desc");
+  if (shortcutDesc) shortcutDesc.textContent = dict.shortcutDesc;
 
   const autostartLabel = document.getElementById("txt-autostart-label");
   if (autostartLabel) autostartLabel.textContent = dict.autostartTitle;
@@ -2434,9 +2465,89 @@ window.addEventListener("DOMContentLoaded", async () => {
           if (currentTheme === "gray") {
             applyTheme("emerald");
           }
+        } else if (styleKey === "chinese") {
+          const currentTheme = localStorage.getItem("baobao_theme") || "gray";
+          if (currentTheme === "gray") {
+            applyTheme("sunset");
+          }
         }
       }
     });
+  });
+
+  // Shortcut key configuration
+  const btnShortcut = document.getElementById("btn-shortcut-key");
+  btnShortcut?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfx.playClick();
+    isRecordingShortcut = true;
+    btnShortcut.classList.add("recording");
+    const disp = document.getElementById("txt-shortcut-key-display");
+    const dict = I18N[currentLang] || I18N.en;
+    if (disp) disp.textContent = dict.shortcutRecording || "...";
+  });
+
+  window.addEventListener("keydown", async (e) => {
+    if (isRecordingShortcut) {
+      e.preventDefault();
+      e.stopPropagation();
+      isRecordingShortcut = false;
+      const btn = document.getElementById("btn-shortcut-key");
+      btn?.classList.remove("recording");
+
+      if (e.key === "Escape") {
+        updateShortcutDisplay();
+        return;
+      }
+
+      let keyName = e.key;
+      if (e.code === "Backquote" || e.key === "`") keyName = "`";
+      else if (e.code === "Space") keyName = "Space";
+      else if (keyName.length === 1) keyName = keyName.toUpperCase();
+
+      currentShortcutKey = keyName;
+      currentShortcutVk = e.keyCode || 192;
+
+      localStorage.setItem("baobao_shortcut_key", currentShortcutKey);
+      localStorage.setItem("baobao_shortcut_vk", currentShortcutVk.toString());
+      updateShortcutDisplay();
+      sfx.playPop();
+
+      try {
+        await invoke("set_toggle_shortcut", { vkCode: currentShortcutVk });
+      } catch (_) {}
+      return;
+    }
+
+    // Toggle visibility when BaoBao is focused and shortcut key is pressed
+    const activeEl = document.activeElement;
+    const isInputActive = activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA");
+    if (!isInputActive) {
+      const isBacktick = (currentShortcutKey === "`" && (e.key === "`" || e.code === "Backquote"));
+      const isKeyMatch = e.key.toUpperCase() === currentShortcutKey.toUpperCase();
+      if (isBacktick || isKeyMatch) {
+        e.preventDefault();
+        try {
+          await invoke("toggle_window_visibility");
+        } catch (_) {}
+      }
+    }
+  });
+
+  try {
+    invoke("set_toggle_shortcut", { vkCode: currentShortcutVk });
+  } catch (_) {}
+  updateShortcutDisplay();
+
+  // Ensure scrolling inside Settings containers never switches island tabs
+  document.querySelectorAll(".settings-col, .settings-container").forEach((el) => {
+    el.addEventListener(
+      "wheel",
+      (e) => {
+        e.stopPropagation();
+      },
+      { passive: true }
+    );
   });
 
   const sliderOpacity = document.getElementById("slider-theme-opacity") as HTMLInputElement | null;
@@ -2715,7 +2826,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const islandEl = document.getElementById("island");
   islandEl?.addEventListener("wheel", (e) => {
     const target = e.target as HTMLElement | null;
-    // Don't switch tabs if scrolling over volume, full lyrics list, shelf box, or notes tab
+    // Don't switch tabs if scrolling over volume, full lyrics list, shelf box, notes tab, or settings container
     if (
       target?.closest("#volume-group") ||
       target?.closest("#full-lyrics-stream") ||
@@ -2723,6 +2834,8 @@ window.addEventListener("DOMContentLoaded", async () => {
       target?.closest("#shelf-items-grid") ||
       target?.closest("#slide-notes") ||
       target?.closest(".notes-container") ||
+      target?.closest(".settings-container") ||
+      target?.closest(".settings-col") ||
       isInFullLyricsMode
     ) {
       return;
