@@ -220,14 +220,77 @@ const THEMES: Record<string, ThemeConfig> = {
   },
 };
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  let c = hex.replace("#", "");
+  if (c.length === 3) {
+    c = c.split("").map((x) => x + x).join("");
+  }
+  const num = parseInt(c, 16);
+  if (isNaN(num)) return { r: 6, g: 182, b: 212 };
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+}
+
+function adjustHexBrightness(hex: string, percent: number): string {
+  const { r, g, b } = hexToRgb(hex);
+  const factor = 1 + percent / 100;
+  const newR = Math.min(255, Math.max(0, Math.round(r * factor)));
+  const newG = Math.min(255, Math.max(0, Math.round(g * factor)));
+  const newB = Math.min(255, Math.max(0, Math.round(b * factor)));
+  return `#${((1 << 24) + (newR << 16) + (newG << 8) + newB).toString(16).slice(1)}`;
+}
+
+function applyCustomColor(hex: string, save = true): void {
+  if (!hex || !hex.startsWith("#")) hex = "#06b6d4";
+  const { r, g, b } = hexToRgb(hex);
+  const lightHex = adjustHexBrightness(hex, 25);
+  const darkHex = adjustHexBrightness(hex, -20);
+  const glow = `rgba(${r}, ${g}, ${b}, 0.45)`;
+  const gradient = `linear-gradient(135deg, ${lightHex} 0%, ${hex} 50%, ${darkHex} 100%)`;
+  const trackFill = `linear-gradient(90deg, ${lightHex}, ${hex})`;
+
+  const root = document.documentElement;
+  root.style.setProperty("--theme-accent", hex);
+  root.style.setProperty("--theme-accent-gradient", gradient);
+  root.style.setProperty("--theme-glow", glow);
+  root.style.setProperty("--theme-track-fill", trackFill);
+
+  const inputCustom = document.getElementById("input-custom-color") as HTMLInputElement | null;
+  if (inputCustom && inputCustom.value.toLowerCase() !== hex.toLowerCase()) {
+    inputCustom.value = hex;
+  }
+  const hexText = document.getElementById("txt-color-hex-val");
+  if (hexText) {
+    hexText.textContent = hex.toUpperCase();
+  }
+  const swatchCurrent = document.getElementById("color-swatch-current");
+  if (swatchCurrent) {
+    swatchCurrent.style.background = hex;
+  }
+
+  let matchedPreset: string | null = null;
+  document.querySelectorAll(".theme-swatch").forEach((swatch) => {
+    const themeKey = (swatch as HTMLElement).dataset.theme;
+    if (themeKey && THEMES[themeKey] && THEMES[themeKey].accent.toLowerCase() === hex.toLowerCase()) {
+      swatch.classList.add("active");
+      matchedPreset = themeKey;
+    } else {
+      swatch.classList.remove("active");
+    }
+  });
+
+  if (save) {
+    localStorage.setItem("baobao_custom_color", hex);
+    localStorage.setItem("baobao_theme", matchedPreset || "custom");
+  }
+}
+
 function applyTheme(themeKey: string): void {
   const theme = THEMES[themeKey] || THEMES.gray;
-  const root = document.documentElement;
-  root.style.setProperty("--theme-accent", theme.accent);
-  root.style.setProperty("--theme-accent-gradient", theme.accentGradient);
-  root.style.setProperty("--theme-glow", theme.glow);
-  root.style.setProperty("--theme-track-fill", theme.trackFill);
-
+  applyCustomColor(theme.accent, false);
   document.querySelectorAll(".theme-swatch").forEach((swatch) => {
     if ((swatch as HTMLElement).dataset.theme === themeKey) {
       swatch.classList.add("active");
@@ -235,12 +298,13 @@ function applyTheme(themeKey: string): void {
       swatch.classList.remove("active");
     }
   });
-
   localStorage.setItem("baobao_theme", themeKey);
 }
 
-type StyleTheme = "default" | "sakura" | "mountain" | "chinese";
-let currentStyleTheme: StyleTheme = (localStorage.getItem("baobao_style_theme") as StyleTheme) || "default";
+type StyleTheme = "default" | "sakura" | "mountain";
+let rawStyleTheme = localStorage.getItem("baobao_style_theme") || "default";
+if (rawStyleTheme === "chinese") rawStyleTheme = "default";
+let currentStyleTheme: StyleTheme = rawStyleTheme as StyleTheme;
 
 let currentThemeOpacity = parseInt(localStorage.getItem("baobao_theme_opacity") || "25", 10);
 if (isNaN(currentThemeOpacity)) currentThemeOpacity = 25;
@@ -276,8 +340,6 @@ function applyStyleTheme(style: StyleTheme): void {
       island.classList.add("theme-sakura");
     } else if (style === "mountain") {
       island.classList.add("theme-mountain");
-    } else if (style === "chinese") {
-      island.classList.add("theme-chinese");
     }
   }
 
@@ -321,7 +383,6 @@ const I18N: Record<Lang, Record<string, string>> = {
     themeDefault: "Default",
     themeSakura: "Sakura",
     themeMountain: "Mountain",
-    themeChinese: "Chinese",
     themeOpacityLabel: "Opacity",
     shortcutTitle: "Hide / Show Key",
     shortcutDesc: "Keyboard toggle",
@@ -395,7 +456,6 @@ const I18N: Record<Lang, Record<string, string>> = {
     themeDefault: "Standar",
     themeSakura: "Sakura",
     themeMountain: "Gunung",
-    themeChinese: "Chinese",
     themeOpacityLabel: "Transparansi",
     shortcutTitle: "Tombol Hide / Show",
     shortcutDesc: "Pintasan keyboard",
@@ -469,7 +529,6 @@ const I18N: Record<Lang, Record<string, string>> = {
     themeDefault: "標準",
     themeSakura: "桜",
     themeMountain: "山",
-    themeChinese: "中国風",
     themeOpacityLabel: "透明度",
     shortcutTitle: "表示/非表示キー",
     shortcutDesc: "キーボードショートカット",
@@ -609,8 +668,6 @@ function applyLanguage(lang: Lang): void {
   if (txtThemeSakura) txtThemeSakura.textContent = dict.themeSakura;
   const txtThemeMountain = document.getElementById("txt-theme-mountain");
   if (txtThemeMountain) txtThemeMountain.textContent = dict.themeMountain;
-  const txtThemeChinese = document.getElementById("txt-theme-chinese");
-  if (txtThemeChinese) txtThemeChinese.textContent = dict.themeChinese;
   const txtThemeOpacityLabel = document.getElementById("txt-theme-opacity-label");
   if (txtThemeOpacityLabel) txtThemeOpacityLabel.textContent = dict.themeOpacityLabel;
 
@@ -1926,6 +1983,8 @@ function updateMediaUI(payload: MediaPayload): void {
 // Expand & Collapse (Zero-Flicker: NO OS RESIZE)
 // ============================================
 
+let expandCleanupTimer: number | null = null;
+
 function expandIsland(): void {
   if (isDraggingIsland) return;
   if (collapseTimeout) {
@@ -1941,6 +2000,20 @@ function expandIsland(): void {
   island.classList.remove("collapsed");
   island.classList.add("expanded");
 
+  if (expandCleanupTimer) {
+    clearTimeout(expandCleanupTimer);
+  }
+  expandCleanupTimer = window.setTimeout(() => {
+    const activeSlide = document.querySelector(".slide.active") as HTMLElement | null;
+    if (activeSlide) {
+      activeSlide.style.transform = "none";
+    }
+    const bodyEl = document.querySelector(".island-body") as HTMLElement | null;
+    if (bodyEl) {
+      bodyEl.style.transform = "none";
+    }
+  }, 360);
+
   updateProgressUI();
   notifyIslandState();
 }
@@ -1950,6 +2023,15 @@ function collapseIsland(): void {
   if (isDraggingFile) return;
   if (isDraggingIsland) return;
   if (collapseTimeout) clearTimeout(collapseTimeout);
+
+  if (expandCleanupTimer) {
+    clearTimeout(expandCleanupTimer);
+    expandCleanupTimer = null;
+  }
+  const activeSlide = document.querySelector(".slide.active") as HTMLElement | null;
+  if (activeSlide) activeSlide.style.transform = "";
+  const bodyEl = document.querySelector(".island-body") as HTMLElement | null;
+  if (bodyEl) bodyEl.style.transform = "";
 
   collapseTimeout = setTimeout(() => {
     isExpanded = false;
@@ -2385,7 +2467,16 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // --- Settings Tab Controls ---
   const savedTheme = localStorage.getItem("baobao_theme") || "gray";
-  applyTheme(savedTheme);
+  const savedCustomColor = localStorage.getItem("baobao_custom_color");
+  if (savedTheme === "custom" && savedCustomColor) {
+    applyCustomColor(savedCustomColor, false);
+  } else if (THEMES[savedTheme]) {
+    applyTheme(savedTheme);
+  } else if (savedCustomColor) {
+    applyCustomColor(savedCustomColor, false);
+  } else {
+    applyTheme("gray");
+  }
 
   applyThemeOpacity(currentThemeOpacity);
   applyStyleTheme(currentStyleTheme);
@@ -2439,6 +2530,38 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // Custom Color Picker & Pipette Eyedropper
+  const inputCustomColor = document.getElementById("input-custom-color") as HTMLInputElement | null;
+  inputCustomColor?.addEventListener("input", (e) => {
+    const val = (e.target as HTMLInputElement).value;
+    applyCustomColor(val, false);
+  });
+  inputCustomColor?.addEventListener("change", (e) => {
+    const val = (e.target as HTMLInputElement).value;
+    applyCustomColor(val, true);
+    sfx.playPop();
+  });
+
+  const btnEyedropper = document.getElementById("btn-eyedropper");
+  btnEyedropper?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    sfx.playPop();
+    if ("EyeDropper" in window) {
+      try {
+        const eyeDropper = new (window as any).EyeDropper();
+        const res = await eyeDropper.open();
+        if (res && res.sRGBHex) {
+          applyCustomColor(res.sRGBHex, true);
+          sfx.playPop();
+        }
+      } catch (err) {
+        // User cancelled eyedropper
+      }
+    } else {
+      inputCustomColor?.click();
+    }
+  });
+
   document.querySelectorAll(".theme-swatch").forEach((swatch) => {
     swatch.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -2464,11 +2587,6 @@ window.addEventListener("DOMContentLoaded", async () => {
           const currentTheme = localStorage.getItem("baobao_theme") || "gray";
           if (currentTheme === "gray") {
             applyTheme("emerald");
-          }
-        } else if (styleKey === "chinese") {
-          const currentTheme = localStorage.getItem("baobao_theme") || "gray";
-          if (currentTheme === "gray") {
-            applyTheme("sunset");
           }
         }
       }

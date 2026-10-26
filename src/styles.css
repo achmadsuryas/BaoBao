@@ -27,6 +27,9 @@ html, body {
   user-select: none;
   -webkit-user-select: none;
   color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Outer Viewport Container (Spans full monitor width, flush at top edge) */
@@ -74,8 +77,9 @@ html, body {
     border-radius 0.42s ease,
     padding 0.42s ease,
     border-color 0.3s ease;
-  will-change: transform, width, height, border-radius;
-  backface-visibility: hidden;
+  will-change: width, height, border-radius;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body.is-dragging-island #island {
@@ -125,7 +129,7 @@ body.is-dragging-island #island {
 #island.collapsed .island-body {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-4px) scale(0.96);
+  transform: translateY(-4px);
   transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
@@ -206,7 +210,7 @@ body.is-dragging-island #island {
 #island.expanded .island-body {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0) scale(1);
+  transform: none;
   transition: opacity 0.35s ease 0.08s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.08s;
 }
 
@@ -556,22 +560,24 @@ body.is-dragging-island * {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transform: translateX(18px) scale(0.97);
+  transform: translateX(14px);
   pointer-events: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   transition:
-    opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .slide.active {
   display: flex;
   opacity: 1;
-  transform: translateX(0) scale(1);
+  transform: none;
   pointer-events: auto;
 }
 
 .slide.slide-left {
-  transform: translateX(-18px) scale(0.97);
+  transform: translateX(-14px);
 }
 
 /* ============================================
@@ -1818,6 +1824,87 @@ body.is-dragging-island * {
   100% { transform: scale(1.06); opacity: 1; }
 }
 
+/* ============================================
+   Custom Color Picker & Eyedropper Control
+   ============================================ */
+
+.color-picker-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.color-picker-swatch-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 9px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.color-picker-swatch-wrap:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.hidden-color-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.color-swatch-preview {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--theme-accent, #06b6d4);
+  box-shadow: 0 0 8px var(--theme-glow);
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.color-hex-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.6px;
+}
+
+.btn-eyedropper {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e4e4e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-eyedropper:hover {
+  background: var(--theme-accent, #06b6d4);
+  color: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 10px var(--theme-glow);
+}
+
 .theme-swatches-grid {
   display: flex;
   align-items: center;
@@ -1866,7 +1953,7 @@ body.is-dragging-island * {
 }
 
 /* ============================================
-   Island Background Decor (Japanese Sakura Theme)
+   Island Background Decor (Japanese Themes)
    ============================================ */
 
 .island-theme-decor {
@@ -1898,15 +1985,6 @@ body.is-dragging-island * {
   mix-blend-mode: screen;
 }
 
-#island.theme-chinese .island-theme-decor {
-  opacity: var(--theme-decor-opacity, 0.25);
-  background-image: url("/assets/themes/chinese_bg.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-  mix-blend-mode: screen;
-}
-
 #island.theme-sakura {
   border-color: rgba(255, 160, 180, 0.28);
 }
@@ -1915,17 +1993,13 @@ body.is-dragging-island * {
   border-color: rgba(52, 211, 153, 0.28);
 }
 
-#island.theme-chinese {
-  border-color: rgba(239, 68, 68, 0.32);
-}
-
 /* ============================================
-   UI Style Theme Selection (Text-Only 2x2 Grid)
+   UI Style Theme Selection (Text-Only 3-Column Grid)
    ============================================ */
 
 .style-theme-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
   margin-top: 3px;
   margin-bottom: 6px;
@@ -1935,7 +2009,7 @@ body.is-dragging-island * {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 6px;
+  padding: 4px 4px;
   height: 26px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
