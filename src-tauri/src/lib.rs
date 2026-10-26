@@ -421,6 +421,11 @@ fn set_autostart(enable: bool) -> Result<(), String> {
         use std::process::{Command, Stdio};
         const CREATE_NO_WINDOW: u32 = 0x08000000;
         if enable {
+            #[cfg(debug_assertions)]
+            {
+                println!("[Baobao] Skipping autostart registration for debug/dev binary");
+            }
+            #[cfg(not(debug_assertions))]
             if let Ok(exe_path) = std::env::current_exe() {
                 let exe_str = format!("\"{}\"", exe_path.to_string_lossy());
                 // Remove legacy keys if exist (silence output)
@@ -1503,8 +1508,13 @@ pub fn run() {
                     .build(app)?;
             }
 
-            // Enable Windows autostart on boot by default
+            // Enable Windows autostart on boot by default in release builds
+            #[cfg(not(debug_assertions))]
             let _ = set_autostart(true);
+
+            // In debug mode, ensure any dev binary is NOT in Windows autostart
+            #[cfg(debug_assertions)]
+            let _ = set_autostart(false);
 
             println!("[Baobao] Setup complete!");
             Ok(())
