@@ -10,6 +10,10 @@
   --theme-accent-gradient: linear-gradient(135deg, #e4e4e7 0%, #a1a1aa 50%, #71717a 100%);
   --theme-glow: rgba(161, 161, 170, 0.4);
   --theme-track-fill: linear-gradient(90deg, #d4d4d8, #a1a1aa);
+  --island-expand-duration: 0.45s;
+  --slide-duration: 0.28s;
+  --island-bg-custom: rgba(24, 24, 36, 0.9);
+  --island-bg-custom-hex: #181824;
 }
 
 * {
@@ -72,8 +76,8 @@ html, body {
   /* Ultra-smooth Apple Dynamic Island Bouncy Physics */
   transition:
     transform 0.35s cubic-bezier(0.34, 1.35, 0.64, 1),
-    width 0.48s cubic-bezier(0.34, 1.35, 0.64, 1),
-    height 0.48s cubic-bezier(0.34, 1.35, 0.64, 1),
+    width var(--island-expand-duration, 0.45s) cubic-bezier(0.34, 1.35, 0.64, 1),
+    height var(--island-expand-duration, 0.45s) cubic-bezier(0.34, 1.35, 0.64, 1),
     border-radius 0.42s ease,
     padding 0.42s ease,
     border-color 0.3s ease;
@@ -83,7 +87,7 @@ html, body {
 }
 
 body.is-dragging-island #island {
-  transition: width 0.48s cubic-bezier(0.34, 1.35, 0.64, 1), height 0.48s cubic-bezier(0.34, 1.35, 0.64, 1) !important;
+  transition: width var(--island-expand-duration, 0.45s) cubic-bezier(0.34, 1.35, 0.64, 1), height var(--island-expand-duration, 0.45s) cubic-bezier(0.34, 1.35, 0.64, 1) !important;
 }
 
 /* ============================================
@@ -96,8 +100,8 @@ body.is-dragging-island #island {
   border-radius: 0 0 18px 18px;
   padding: 0 12px;
   transition:
-    width 0.46s cubic-bezier(0.34, 1.35, 0.64, 1),
-    height 0.46s cubic-bezier(0.34, 1.35, 0.64, 1),
+    width var(--island-expand-duration, 0.45s) cubic-bezier(0.34, 1.35, 0.64, 1),
+    height var(--island-expand-duration, 0.45s) cubic-bezier(0.34, 1.35, 0.64, 1),
     border-radius 0.4s ease,
     padding 0.4s ease;
 }
@@ -211,7 +215,7 @@ body.is-dragging-island #island {
   opacity: 1;
   pointer-events: auto;
   transform: none;
-  transition: opacity 0.35s ease 0.08s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.08s;
+  transition: opacity var(--slide-duration, 0.28s) ease 0.05s, transform var(--slide-duration, 0.28s) cubic-bezier(0.16, 1, 0.3, 1) 0.05s;
 }
 
 #island.expanded .carousel-dots {
@@ -1993,14 +1997,25 @@ body.is-dragging-island * {
   border-color: rgba(52, 211, 153, 0.28);
 }
 
+#island.theme-color {
+  background: var(--island-bg-custom, rgba(24, 24, 36, 0.9)) !important;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+#island.theme-color .island-theme-decor {
+  opacity: var(--theme-decor-opacity, 0.25);
+  background: var(--island-bg-custom-hex, #181824);
+  mix-blend-mode: normal;
+}
+
 /* ============================================
-   UI Style Theme Selection (Text-Only 3-Column Grid)
+   UI Style Theme Selection (Text-Only 4-Column Grid)
    ============================================ */
 
 .style-theme-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
   margin-top: 3px;
   margin-bottom: 6px;
 }
@@ -2009,7 +2024,7 @@ body.is-dragging-island * {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 4px;
+  padding: 4px 3px;
   height: 26px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -2035,6 +2050,161 @@ body.is-dragging-island * {
   border-color: var(--theme-accent);
   color: #ffffff;
   box-shadow: 0 0 8px var(--theme-glow);
+}
+
+.theme-bg-color-control {
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+/* ============================================
+   Animation Duration Slider & Danger Button
+   ============================================ */
+
+.anim-speed-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 140px;
+}
+
+.anim-speed-val {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--theme-accent);
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.anim-slider {
+  margin: 0 !important;
+  flex: 1;
+}
+
+.danger-icon {
+  color: #ef4444;
+}
+
+.btn-danger-pill {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  color: #fca5a5 !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+.btn-danger-pill:hover {
+  background: rgba(239, 68, 68, 0.25) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.45) !important;
+}
+
+/* ============================================
+   Reset Confirmation Modal Dialog
+   ============================================ */
+
+.confirm-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.76);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeInModal 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInModal {
+  0% { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.confirm-modal-card {
+  background: rgba(20, 20, 24, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 16px 20px;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.confirm-modal-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.16);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.confirm-modal-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.confirm-modal-desc {
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: #a1a1aa;
+  margin: 0;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.btn-modal-cancel {
+  flex: 1;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e4e4e7;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-modal-cancel:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.btn-modal-confirm {
+  flex: 1;
+  height: 30px;
+  border-radius: 8px;
+  background: #dc2626;
+  border: 1px solid #ef4444;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-modal-confirm:hover {
+  background: #ef4444;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
 }
 
 /* ============================================

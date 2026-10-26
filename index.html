@@ -513,6 +513,45 @@
                       <span id="txt-shortcut-key-display">`</span>
                     </button>
                   </div>
+
+                  <!-- Animation Duration Slider (Hover & Open Speed) -->
+                  <div id="settings-item-anim-speed" class="settings-item settings-item-compact">
+                    <div class="settings-meta">
+                      <div class="settings-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                      </div>
+                      <div class="settings-texts">
+                        <span id="txt-anim-speed-label" class="settings-label">Animation Speed</span>
+                        <span id="txt-anim-speed-desc" class="settings-desc">Hover & open duration</span>
+                      </div>
+                    </div>
+                    <div class="anim-speed-control">
+                      <span id="txt-anim-speed-val" class="anim-speed-val">0.45s</span>
+                      <input type="range" id="slider-anim-speed" min="150" max="900" step="50" value="450" class="theme-opacity-slider anim-slider" />
+                    </div>
+                  </div>
+
+                  <!-- Reset All Settings to Default -->
+                  <div id="settings-item-reset-all" class="settings-item settings-item-compact">
+                    <div class="settings-meta">
+                      <div class="settings-icon danger-icon">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                          <path d="M3 3v5h5"></path>
+                        </svg>
+                      </div>
+                      <div class="settings-texts">
+                        <span id="txt-reset-all-label" class="settings-label">Reset Settings</span>
+                        <span id="txt-reset-all-desc" class="settings-desc">Restore all defaults</span>
+                      </div>
+                    </div>
+                    <button id="btn-reset-all-settings" class="btn-setting-action btn-danger-pill" title="Reset semua pengaturan BaoBao ke awal (dengan konfirmasi)">
+                      <span id="txt-reset-all-btn">Reset</span>
+                    </button>
+                  </div>
                 </div>
 
                 <!-- Divider -->
@@ -578,6 +617,28 @@
                     <button class="style-theme-btn" data-style-theme="mountain" title="Japanese Mountain Landscape">
                       <span id="txt-theme-mountain">Mountain</span>
                     </button>
+                    <button class="style-theme-btn" data-style-theme="color" title="Custom Background Color">
+                      <span id="txt-theme-color">Color</span>
+                    </button>
+                  </div>
+
+                  <!-- 2.1 Custom Theme Background Color Picker (Active when 'Color' theme chosen) -->
+                  <div id="theme-bg-color-control" class="theme-bg-color-control" style="display: none;">
+                    <div class="color-picker-control">
+                      <label class="color-picker-swatch-wrap" title="Klik untuk pilih warna background (Color Dialog)">
+                        <input type="color" id="input-theme-bg-color" value="#181824" class="hidden-color-input" />
+                        <span id="theme-bg-swatch-current" class="color-swatch-preview"></span>
+                        <span id="txt-theme-bg-hex-val" class="color-hex-text">#181824</span>
+                      </label>
+                      <button id="btn-theme-bg-eyedropper" class="btn-eyedropper" title="Ambil warna background dari layar (Pipette)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"></path>
+                          <path d="m5 2 5 5"></path>
+                          <path d="m2 22 5.5-1.5L21.1 6.9a2.1 2.1 0 0 0 0-3l-1-1a2.1 2.1 0 0 0-3 0L3.5 16.5 2 22Z"></path>
+                          <circle cx="19" cy="5" r="1"></circle>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
 
                   <!-- 3. Theme Background Opacity Slider -->
@@ -611,6 +672,27 @@
           <span class="dot" data-index="1" title="Shelf"></span>
           <span class="dot" data-index="2" title="Notes"></span>
           <span class="dot" data-index="3" title="Settings"></span>
+        </div>
+
+        <!-- Reset Confirmation Modal Dialog -->
+        <div id="modal-reset-confirm" class="confirm-modal-overlay" style="display: none;">
+          <div class="confirm-modal-card">
+            <div class="confirm-modal-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h4 id="txt-modal-reset-title" class="confirm-modal-title">Reset Semua Pengaturan?</h4>
+            <p id="txt-modal-reset-desc" class="confirm-modal-desc">
+              Semua preferensi warna, tema, pintasan keyboard, durasi animasi, dan posisi akan dikembalikan ke setelan awal.
+            </p>
+            <div class="confirm-modal-actions">
+              <button id="btn-cancel-reset" class="btn-modal-cancel">Batal</button>
+              <button id="btn-confirm-reset" class="btn-modal-confirm">Ya, Reset</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

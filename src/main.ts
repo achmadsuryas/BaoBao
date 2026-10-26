@@ -301,10 +301,15 @@ function applyTheme(themeKey: string): void {
   localStorage.setItem("baobao_theme", themeKey);
 }
 
-type StyleTheme = "default" | "sakura" | "mountain";
+type StyleTheme = "default" | "sakura" | "mountain" | "color";
 let rawStyleTheme = localStorage.getItem("baobao_style_theme") || "default";
 if (rawStyleTheme === "chinese") rawStyleTheme = "default";
 let currentStyleTheme: StyleTheme = rawStyleTheme as StyleTheme;
+
+let currentThemeBgColor = localStorage.getItem("baobao_theme_bg_color") || "#181824";
+
+let currentAnimDuration = parseInt(localStorage.getItem("baobao_anim_duration") || "450", 10);
+if (isNaN(currentAnimDuration) || currentAnimDuration < 150 || currentAnimDuration > 1000) currentAnimDuration = 450;
 
 let currentThemeOpacity = parseInt(localStorage.getItem("baobao_theme_opacity") || "25", 10);
 if (isNaN(currentThemeOpacity)) currentThemeOpacity = 25;
@@ -319,6 +324,44 @@ function updateShortcutDisplay(): void {
   if (disp) disp.textContent = currentShortcutKey;
 }
 
+function applyAnimDuration(ms: number): void {
+  currentAnimDuration = ms;
+  const sec = (ms / 1000).toFixed(2);
+  const slideSec = (ms * 0.62 / 1000).toFixed(2);
+  document.documentElement.style.setProperty("--island-expand-duration", `${sec}s`);
+  document.documentElement.style.setProperty("--slide-duration", `${slideSec}s`);
+  const valEl = document.getElementById("txt-anim-speed-val");
+  if (valEl) valEl.textContent = `${sec}s`;
+  const slider = document.getElementById("slider-anim-speed") as HTMLInputElement | null;
+  if (slider && parseInt(slider.value, 10) !== ms) {
+    slider.value = ms.toString();
+  }
+  localStorage.setItem("baobao_anim_duration", ms.toString());
+}
+
+function applyThemeBgColor(hex: string, save = true): void {
+  if (!hex || !hex.startsWith("#")) hex = "#181824";
+  currentThemeBgColor = hex;
+  const { r, g, b } = hexToRgb(hex);
+  const opacityVal = Math.max(0.15, currentThemeOpacity / 100);
+  const customRgba = `rgba(${r}, ${g}, ${b}, ${opacityVal})`;
+  document.documentElement.style.setProperty("--island-bg-custom", customRgba);
+  document.documentElement.style.setProperty("--island-bg-custom-hex", hex);
+
+  const inputEl = document.getElementById("input-theme-bg-color") as HTMLInputElement | null;
+  if (inputEl && inputEl.value.toLowerCase() !== hex.toLowerCase()) {
+    inputEl.value = hex;
+  }
+  const hexText = document.getElementById("txt-theme-bg-hex-val");
+  if (hexText) hexText.textContent = hex.toUpperCase();
+  const swatchEl = document.getElementById("theme-bg-swatch-current");
+  if (swatchEl) swatchEl.style.background = hex;
+
+  if (save) {
+    localStorage.setItem("baobao_theme_bg_color", hex);
+  }
+}
+
 function applyThemeOpacity(val: number): void {
   currentThemeOpacity = val;
   document.documentElement.style.setProperty("--theme-decor-opacity", (val / 100).toString());
@@ -328,6 +371,7 @@ function applyThemeOpacity(val: number): void {
   if (slider && parseInt(slider.value, 10) !== val) {
     slider.value = val.toString();
   }
+  applyThemeBgColor(currentThemeBgColor, false);
   localStorage.setItem("baobao_theme_opacity", val.toString());
 }
 
@@ -335,11 +379,14 @@ function applyStyleTheme(style: StyleTheme): void {
   currentStyleTheme = style;
   const island = document.getElementById("island");
   if (island) {
-    island.classList.remove("theme-sakura", "theme-mountain", "theme-chinese");
+    island.classList.remove("theme-sakura", "theme-mountain", "theme-color");
     if (style === "sakura") {
       island.classList.add("theme-sakura");
     } else if (style === "mountain") {
       island.classList.add("theme-mountain");
+    } else if (style === "color") {
+      island.classList.add("theme-color");
+      applyThemeBgColor(currentThemeBgColor, false);
     }
   }
 
@@ -351,6 +398,11 @@ function applyStyleTheme(style: StyleTheme): void {
       el.classList.remove("active");
     }
   });
+
+  const bgColorCtrl = document.getElementById("theme-bg-color-control");
+  if (bgColorCtrl) {
+    bgColorCtrl.style.display = style === "color" ? "block" : "none";
+  }
 
   const opacityCtrl = document.getElementById("theme-opacity-control");
   if (opacityCtrl) {
@@ -383,7 +435,17 @@ const I18N: Record<Lang, Record<string, string>> = {
     themeDefault: "Default",
     themeSakura: "Sakura",
     themeMountain: "Mountain",
+    themeColor: "Color",
     themeOpacityLabel: "Opacity",
+    animSpeedTitle: "Animation Speed",
+    animSpeedDesc: "Hover & open duration",
+    resetAllTitle: "Reset Settings",
+    resetAllDesc: "Restore all defaults",
+    resetAllBtn: "Reset",
+    resetConfirmTitle: "Reset All Settings?",
+    resetConfirmDesc: "All themes, colors, shortcuts, animation speed, and positions will be restored to default. Are you sure?",
+    btnCancel: "Cancel",
+    btnConfirmReset: "Yes, Reset",
     shortcutTitle: "Hide / Show Key",
     shortcutDesc: "Keyboard toggle",
     shortcutRecording: "Press key...",
@@ -456,7 +518,17 @@ const I18N: Record<Lang, Record<string, string>> = {
     themeDefault: "Standar",
     themeSakura: "Sakura",
     themeMountain: "Gunung",
+    themeColor: "Warna",
     themeOpacityLabel: "Transparansi",
+    animSpeedTitle: "Durasi Animasi",
+    animSpeedDesc: "Kecepatan hover & buka",
+    resetAllTitle: "Reset Pengaturan",
+    resetAllDesc: "Kembalikan ke awal",
+    resetAllBtn: "Reset",
+    resetConfirmTitle: "Reset Semua Pengaturan?",
+    resetConfirmDesc: "Semua preferensi warna, tema, pintasan keyboard, durasi animasi, dan posisi akan dikembalikan ke setelan awal. Apakah Anda yakin?",
+    btnCancel: "Batal",
+    btnConfirmReset: "Ya, Reset",
     shortcutTitle: "Tombol Hide / Show",
     shortcutDesc: "Pintasan keyboard",
     shortcutRecording: "Tekan tombol...",
@@ -529,7 +601,17 @@ const I18N: Record<Lang, Record<string, string>> = {
     themeDefault: "標準",
     themeSakura: "桜",
     themeMountain: "山",
+    themeColor: "カラー",
     themeOpacityLabel: "透明度",
+    animSpeedTitle: "アニメーション速度",
+    animSpeedDesc: "ホバー・開く時間",
+    resetAllTitle: "設定を初期化",
+    resetAllDesc: "すべて初期状態に戻す",
+    resetAllBtn: "リセット",
+    resetConfirmTitle: "すべての設定を初期化しますか？",
+    resetConfirmDesc: "カラー、テーマ、ショートカット、アニメーション速度、配置などがすべて初期状態に戻ります。よろしいですか？",
+    btnCancel: "キャンセル",
+    btnConfirmReset: "初期化する",
     shortcutTitle: "表示/非表示キー",
     shortcutDesc: "キーボードショートカット",
     shortcutRecording: "キーを押す...",
@@ -668,8 +750,31 @@ function applyLanguage(lang: Lang): void {
   if (txtThemeSakura) txtThemeSakura.textContent = dict.themeSakura;
   const txtThemeMountain = document.getElementById("txt-theme-mountain");
   if (txtThemeMountain) txtThemeMountain.textContent = dict.themeMountain;
+  const txtThemeColor = document.getElementById("txt-theme-color");
+  if (txtThemeColor) txtThemeColor.textContent = dict.themeColor;
   const txtThemeOpacityLabel = document.getElementById("txt-theme-opacity-label");
   if (txtThemeOpacityLabel) txtThemeOpacityLabel.textContent = dict.themeOpacityLabel;
+
+  const animSpeedLabel = document.getElementById("txt-anim-speed-label");
+  if (animSpeedLabel) animSpeedLabel.textContent = dict.animSpeedTitle;
+  const animSpeedDesc = document.getElementById("txt-anim-speed-desc");
+  if (animSpeedDesc) animSpeedDesc.textContent = dict.animSpeedDesc;
+
+  const resetAllLabel = document.getElementById("txt-reset-all-label");
+  if (resetAllLabel) resetAllLabel.textContent = dict.resetAllTitle;
+  const resetAllDesc = document.getElementById("txt-reset-all-desc");
+  if (resetAllDesc) resetAllDesc.textContent = dict.resetAllDesc;
+  const resetAllBtn = document.getElementById("txt-reset-all-btn");
+  if (resetAllBtn) resetAllBtn.textContent = dict.resetAllBtn;
+
+  const modalResetTitle = document.getElementById("txt-modal-reset-title");
+  if (modalResetTitle) modalResetTitle.textContent = dict.resetConfirmTitle;
+  const modalResetDesc = document.getElementById("txt-modal-reset-desc");
+  if (modalResetDesc) modalResetDesc.textContent = dict.resetConfirmDesc;
+  const btnCancelReset = document.getElementById("btn-cancel-reset");
+  if (btnCancelReset) btnCancelReset.textContent = dict.btnCancel;
+  const btnConfirmReset = document.getElementById("btn-confirm-reset");
+  if (btnConfirmReset) btnConfirmReset.textContent = dict.btnConfirmReset;
 
   const shortcutLabel = document.getElementById("txt-shortcut-label");
   if (shortcutLabel) shortcutLabel.textContent = dict.shortcutTitle;
@@ -2012,7 +2117,7 @@ function expandIsland(): void {
     if (bodyEl) {
       bodyEl.style.transform = "none";
     }
-  }, 360);
+  }, Math.max(200, currentAnimDuration - 30));
 
   updateProgressUI();
   notifyIslandState();
@@ -2479,7 +2584,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   applyThemeOpacity(currentThemeOpacity);
+  applyThemeBgColor(currentThemeBgColor, false);
   applyStyleTheme(currentStyleTheme);
+  applyAnimDuration(currentAnimDuration);
 
   applyLanguage((localStorage.getItem("baobao_lang") as Lang) || "en");
 
@@ -2676,6 +2783,127 @@ window.addEventListener("DOMContentLoaded", async () => {
       applyThemeOpacity(val);
     });
   }
+
+  // --- Animation Duration Slider (Hover & Open Speed) ---
+  const sliderAnimSpeed = document.getElementById("slider-anim-speed") as HTMLInputElement | null;
+  if (sliderAnimSpeed) {
+    sliderAnimSpeed.value = currentAnimDuration.toString();
+    sliderAnimSpeed.addEventListener("input", () => {
+      const val = parseInt(sliderAnimSpeed.value, 10);
+      applyAnimDuration(val);
+    });
+    sliderAnimSpeed.addEventListener("change", () => {
+      sfx.playPop();
+    });
+  }
+
+  // --- Theme Background Color Control ---
+  const inputThemeBgColor = document.getElementById("input-theme-bg-color") as HTMLInputElement | null;
+  inputThemeBgColor?.addEventListener("input", (e) => {
+    const val = (e.target as HTMLInputElement).value;
+    applyThemeBgColor(val, false);
+  });
+  inputThemeBgColor?.addEventListener("change", (e) => {
+    const val = (e.target as HTMLInputElement).value;
+    applyThemeBgColor(val, true);
+    sfx.playPop();
+  });
+
+  const btnThemeBgEyedropper = document.getElementById("btn-theme-bg-eyedropper");
+  btnThemeBgEyedropper?.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    sfx.playPop();
+    if ("EyeDropper" in window) {
+      try {
+        const eyeDropper = new (window as any).EyeDropper();
+        const res = await eyeDropper.open();
+        if (res && res.sRGBHex) {
+          applyThemeBgColor(res.sRGBHex, true);
+          sfx.playPop();
+        }
+      } catch (_) {}
+    } else {
+      inputThemeBgColor?.click();
+    }
+  });
+
+  // --- Reset All Settings to Default (with Confirmation Modal) ---
+  const btnResetAll = document.getElementById("btn-reset-all-settings");
+  const modalResetConfirm = document.getElementById("modal-reset-confirm");
+  const btnCancelReset = document.getElementById("btn-cancel-reset");
+  const btnConfirmReset = document.getElementById("btn-confirm-reset");
+
+  btnResetAll?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfx.playClick();
+    if (modalResetConfirm) modalResetConfirm.style.display = "flex";
+  });
+
+  btnCancelReset?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfx.playClick();
+    if (modalResetConfirm) modalResetConfirm.style.display = "none";
+  });
+
+  modalResetConfirm?.addEventListener("click", (e) => {
+    if (e.target === modalResetConfirm) {
+      modalResetConfirm.style.display = "none";
+    }
+  });
+
+  function resetAllSettingsToDefault(): void {
+    // 1. Reset theme & colors
+    localStorage.removeItem("baobao_theme");
+    localStorage.removeItem("baobao_custom_color");
+    localStorage.removeItem("baobao_style_theme");
+    localStorage.removeItem("baobao_theme_bg_color");
+    localStorage.removeItem("baobao_theme_opacity");
+    applyTheme("gray");
+    applyThemeBgColor("#181824", true);
+    applyThemeOpacity(25);
+    applyStyleTheme("default");
+
+    // 2. Reset animation speed
+    localStorage.removeItem("baobao_anim_duration");
+    applyAnimDuration(450);
+
+    // 3. Reset keyboard shortcut
+    localStorage.removeItem("baobao_shortcut_key");
+    localStorage.removeItem("baobao_shortcut_vk");
+    currentShortcutKey = "`";
+    currentShortcutVk = 192;
+    updateShortcutDisplay();
+    try {
+      invoke("set_toggle_shortcut", { vkCode: 192 });
+    } catch (_) {}
+
+    // 4. Reset island position
+    localStorage.removeItem("baobao_offset_x");
+    const islandEl = document.getElementById("island");
+    if (islandEl) islandEl.style.setProperty("--island-offset-x", "0px");
+    try {
+      invoke("reset_window_horizontal_offset");
+    } catch (_) {}
+    notifyIslandState();
+
+    // 5. Reset toggles
+    sfx.setEnabled(true);
+    const toggleSfx = document.getElementById("toggle-sfx") as HTMLInputElement | null;
+    if (toggleSfx) toggleSfx.checked = true;
+
+    miniLyricsEnabled = true;
+    localStorage.setItem("baobao_mini_lyrics", "true");
+    const toggleMini = document.getElementById("toggle-mini-lyrics") as HTMLInputElement | null;
+    if (toggleMini) toggleMini.checked = true;
+    updateMiniLyricsPill();
+  }
+
+  btnConfirmReset?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfx.playExplode();
+    if (modalResetConfirm) modalResetConfirm.style.display = "none";
+    resetAllSettingsToDefault();
+  });
 
   // --- Shelf Stash Initialization & Drag-Drop Listeners ---
   loadShelfItems();
