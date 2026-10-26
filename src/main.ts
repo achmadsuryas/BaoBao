@@ -593,10 +593,25 @@ function setShelfView(view: "slider" | "grid"): void {
   if (btnGrid) btnGrid.classList.toggle("active", view === "grid");
 }
 
+function cleanItemDisplayName(rawName: string): string {
+  if (rawName.toLowerCase().endsWith(".lnk")) {
+    return rawName.slice(0, -4);
+  }
+  if (rawName.toLowerCase().endsWith(".url")) {
+    return rawName.slice(0, -4);
+  }
+  return rawName;
+}
+
 function loadShelfItems(): void {
   try {
     const saved = localStorage.getItem("baobao_shelf_items");
-    if (saved) shelfItems = JSON.parse(saved);
+    if (saved) {
+      shelfItems = JSON.parse(saved);
+      shelfItems.forEach((item) => {
+        item.name = cleanItemDisplayName(item.name);
+      });
+    }
   } catch (_) {
     shelfItems = [];
   }
@@ -705,7 +720,8 @@ async function addFilesToShelf(paths: string[]): Promise<void> {
     if (shelfItems.some((item) => item.path === p)) continue;
     const clean = p.replace(/\\/g, "/");
     const parts = clean.split("/");
-    const name = parts[parts.length - 1] || p;
+    const rawName = parts[parts.length - 1] || p;
+    const name = cleanItemDisplayName(rawName);
     const type = detectFileType(p);
 
     let realIcon: string | undefined = undefined;
@@ -756,7 +772,8 @@ function renderShelf(): void {
     const el = document.createElement("div");
     el.className = "shelf-item";
     el.dataset.id = item.id;
-    el.title = `${item.name}\n${item.path}\nClick to open`;
+    const displayName = cleanItemDisplayName(item.name);
+    el.title = `${displayName}\n${item.path}\nClick to open`;
 
     const iconContent = item.icon
       ? `<img src="${item.icon}" class="shelf-item-real-icon" alt="" />`
@@ -769,7 +786,7 @@ function renderShelf(): void {
       <div class="shelf-item-icon ${item.type}">
         ${iconContent}
       </div>
-      <span class="shelf-item-name" title="${item.name}">${item.name}</span>
+      <span class="shelf-item-name" title="${displayName}">${displayName}</span>
     `;
 
     el.addEventListener("click", async (e) => {
