@@ -595,7 +595,7 @@ fn get_autostart() -> bool {
 
 
 
-use std::sync::atomic::{AtomicBool, AtomicI32, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI32, AtomicU32, AtomicU64, Ordering};
 
 static IS_EXPANDED: AtomicBool = AtomicBool::new(false);
 static WITH_LYRICS: AtomicBool = AtomicBool::new(false);
@@ -604,6 +604,23 @@ static MINI_WIDTH: AtomicU32 = AtomicU32::new(330);
 static ISLAND_OFFSET_X: AtomicI32 = AtomicI32::new(0);
 static GLOBAL_HOTKEY_VK: AtomicU32 = AtomicU32::new(0xC0); // VK_OEM_3 (` ~)
 static IS_HOTKEY_DOWN: AtomicBool = AtomicBool::new(false);
+static LAST_TOGGLE_MS: AtomicU64 = AtomicU64::new(0);
+
+fn perform_toggle(window: &tauri::WebviewWindow) {
+    let now = now_ms() as u64;
+    let prev = LAST_TOGGLE_MS.load(Ordering::Relaxed);
+    if now.saturating_sub(prev) < 280 {
+        return; // debounce 280ms to avoid flick and chatter
+    }
+    LAST_TOGGLE_MS.store(now, Ordering::Relaxed);
+
+    if window.is_visible().unwrap_or(true) {
+        let _ = window.hide();
+    } else {
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
 
 /// Configure the global shortcut virtual key code (default: 0xC0 for `)
 #[tauri::command]
@@ -614,12 +631,7 @@ fn set_toggle_shortcut(vk_code: u32) {
 /// Toggle visibility of the main window
 #[tauri::command]
 fn toggle_window_visibility(window: tauri::WebviewWindow) {
-    if window.is_visible().unwrap_or(true) {
-        let _ = window.hide();
-    } else {
-        let _ = window.show();
-        let _ = window.set_focus();
-    }
+    perform_toggle(&window);
 }
 
 /// Notify Rust of the current island dimensions and horizontal offset for the click-through hit-test thread
@@ -1214,12 +1226,7 @@ fn start_cursor_hit_test(window: tauri::WebviewWindow) {
                 let is_down = (state as u16 & 0x8000) != 0;
                 let was_down = IS_HOTKEY_DOWN.swap(is_down, Ordering::Relaxed);
                 if is_down && !was_down {
-                    if window.is_visible().unwrap_or(true) {
-                        let _ = window.hide();
-                    } else {
-                        let _ = window.show();
-                        let _ = window.set_focus();
-                    }
+                    perform_toggle(&window);
                 }
             }
 

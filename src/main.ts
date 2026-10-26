@@ -2744,7 +2744,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Toggle visibility when BaoBao is focused and shortcut key is pressed
+    // Prevent typing shortcut character into document while not recording
     const activeEl = document.activeElement;
     const isInputActive = activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA");
     if (!isInputActive) {
@@ -2752,9 +2752,6 @@ window.addEventListener("DOMContentLoaded", async () => {
       const isKeyMatch = e.key.toUpperCase() === currentShortcutKey.toUpperCase();
       if (isBacktick || isKeyMatch) {
         e.preventDefault();
-        try {
-          await invoke("toggle_window_visibility");
-        } catch (_) {}
       }
     }
   });
