@@ -908,14 +908,31 @@ function setLocalPlaying(playing: boolean): void {
 
 let currentMiniWidth = 330;
 
+function getClampedOffset(offset: number, islandWidth: number): number {
+  const screenW = window.innerWidth;
+  const maxAllowedOffset = Math.max(0, (screenW - islandWidth) / 2 - 16);
+  return Math.max(-maxAllowedOffset, Math.min(maxAllowedOffset, offset));
+}
+
 function notifyIslandState(): void {
   const hasMiniLyrics = !isExpanded && !isMusicIdle && (currentMedia.is_playing || !!currentMedia.title) && activeLyrics.length > 0 && miniLyricsEnabled;
   const isWide = ((isLyricsOpen || isInFullLyricsMode) && !isMusicIdle) || (isExpanded && currentSlide === 3);
+
+  const islandEl = document.getElementById("island");
+  const estimatedW = isExpanded ? (isWide ? 660 : 480) : (hasMiniLyrics ? (currentMiniWidth || 330) : 210);
+  const actualW = islandEl ? islandEl.offsetWidth || estimatedW : estimatedW;
+
+  currentOffsetX = getClampedOffset(currentOffsetX, actualW);
+  if (islandEl) {
+    islandEl.style.setProperty("--island-offset-x", `${currentOffsetX}px`);
+  }
+
   invoke("update_island_state", {
     expanded: isExpanded,
     withLyrics: isWide,
     withMiniLyrics: hasMiniLyrics,
     miniWidth: currentMiniWidth,
+    offsetX: currentOffsetX,
   }).catch(() => {});
 }
 
@@ -1952,15 +1969,18 @@ window.addEventListener("DOMContentLoaded", async () => {
   // ============================================
   // Horizontal Dragging & Smooth Hover Controller
   // ============================================
-  // Apply saved horizontal position on launch
-  if (currentOffsetX !== 0) {
-    invoke("set_window_horizontal_offset", { offsetX: currentOffsetX }).catch(console.error);
-  }
-
   const island = document.getElementById("island");
   if (island) {
+    const initialWidth = island.offsetWidth || 210;
+    currentOffsetX = getClampedOffset(currentOffsetX, initialWidth);
+    island.style.setProperty("--island-offset-x", `${currentOffsetX}px`);
+    invoke("set_window_horizontal_offset", { offsetX: currentOffsetX }).catch(console.error);
     initHorizontalDrag(island);
   }
+
+  window.addEventListener("resize", () => {
+    notifyIslandState();
+  });
 
   function initHorizontalDrag(islandEl: HTMLElement): void {
     // Reset Center button in Settings
@@ -1971,7 +1991,9 @@ window.addEventListener("DOMContentLoaded", async () => {
         sfx.playPop();
         currentOffsetX = 0;
         localStorage.setItem("baobao_offset_x", "0");
+        islandEl.style.setProperty("--island-offset-x", "0px");
         await invoke("reset_window_horizontal_offset").catch(console.error);
+        notifyIslandState();
 
         const txtResetBtn = document.getElementById("txt-reset-pos-btn");
         if (txtResetBtn) {
@@ -2027,7 +2049,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
 
       if (isDraggingIsland) {
-        currentOffsetX = dragInitialOffset + deltaX;
+        const islandWidth = islandEl.offsetWidth || (isExpanded ? (isLyricsOpen ? 660 : 480) : 210);
+        currentOffsetX = getClampedOffset(dragInitialOffset + deltaX, islandWidth);
+        islandEl.style.setProperty("--island-offset-x", `${currentOffsetX}px`);
         invoke("set_window_horizontal_offset", { offsetX: currentOffsetX }).catch(console.error);
       }
     }

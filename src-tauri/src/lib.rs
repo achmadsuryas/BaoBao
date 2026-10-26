@@ -595,21 +595,31 @@ fn get_autostart() -> bool {
 
 
 
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI32, AtomicU32, Ordering};
 
 static IS_EXPANDED: AtomicBool = AtomicBool::new(false);
 static WITH_LYRICS: AtomicBool = AtomicBool::new(false);
 static WITH_MINI_LYRICS: AtomicBool = AtomicBool::new(false);
 static MINI_WIDTH: AtomicU32 = AtomicU32::new(330);
+static ISLAND_OFFSET_X: AtomicI32 = AtomicI32::new(0);
 
-/// Notify Rust of the current island dimensions for the click-through hit-test thread
+/// Notify Rust of the current island dimensions and horizontal offset for the click-through hit-test thread
 #[tauri::command]
-fn update_island_state(expanded: bool, with_lyrics: bool, with_mini_lyrics: bool, mini_width: Option<f64>) {
+fn update_island_state(
+    expanded: bool,
+    with_lyrics: bool,
+    with_mini_lyrics: bool,
+    mini_width: Option<f64>,
+    offset_x: Option<f64>,
+) {
     IS_EXPANDED.store(expanded, Ordering::Relaxed);
     WITH_LYRICS.store(with_lyrics, Ordering::Relaxed);
     WITH_MINI_LYRICS.store(with_mini_lyrics, Ordering::Relaxed);
     if let Some(w) = mini_width {
         MINI_WIDTH.store(w.round() as u32, Ordering::Relaxed);
+    }
+    if let Some(off) = offset_x {
+        ISLAND_OFFSET_X.store(off.round() as i32, Ordering::Relaxed);
     }
 }
 
@@ -751,7 +761,7 @@ fn resize_window(app: AppHandle, width: f64, height: f64) -> Result<(), String> 
 // Window Positioning
 // ============================================
 
-/// Position a window at the horizontal center of the monitor, offset 0px from top.
+/// Position the window flush at top, spanning 100% of the active monitor's width.
 fn position_top_center(window: &tauri::WebviewWindow) -> Result<(), String> {
     let monitor = window
         .current_monitor()
@@ -761,47 +771,15 @@ fn position_top_center(window: &tauri::WebviewWindow) -> Result<(), String> {
 
     let monitor_size = monitor.size();
     let monitor_position = monitor.position();
-    let window_size = window.outer_size().map_err(|e| e.to_string())?;
-
-    let x = monitor_position.x + ((monitor_size.width as i32 - window_size.width as i32) / 2);
-    let y = monitor_position.y;
-
-    window
-        .set_position(PhysicalPosition::new(x, y))
-        .map_err(|e| e.to_string())?;
-
-    Ok(())
-}
-
-/// Move the window horizontally while keeping Y strictly locked to the top of the current monitor.
-/// `offset_x` is the logical pixel offset from the monitor's horizontal center.
-#[tauri::command]
-fn set_window_horizontal_offset(app: AppHandle, offset_x: f64) -> Result<(), String> {
-    let window = app
-        .get_webview_window("main")
-        .ok_or("Main window not found")?;
-
     let scale = window.scale_factor().unwrap_or(1.0);
-    let monitor = window
-        .current_monitor()
-        .map_err(|e| e.to_string())?
-        .or_else(|| window.primary_monitor().ok().flatten())
-        .ok_or("No monitor detected")?;
 
-    let monitor_size = monitor.size();
-    let monitor_position = monitor.position();
-    let window_size = window.outer_size().map_err(|e| e.to_string())?;
+    let full_w_phys = monitor_size.width;
+    let h_phys = (260.0 * scale).round() as u32;
 
-    let center_x = monitor_position.x + ((monitor_size.width as i32 - window_size.width as i32) / 2);
-    let offset_phys = (offset_x * scale).round() as i32;
-    let mut target_x = center_x + offset_phys;
+    let _ = window.set_size(PhysicalSize::new(full_w_phys, h_phys));
 
-    // Prevent dragging off screen
-    let min_x = monitor_position.x - (window_size.width as i32 / 2) + 120;
-    let max_x = monitor_position.x + monitor_size.width as i32 - (window_size.width as i32 / 2) - 120;
-    target_x = target_x.clamp(min_x, max_x);
-
-    let y = monitor_position.y; // Strictly locked to top of the screen!
+    let x = monitor_position.x;
+    let y = monitor_position.y;
 
     #[cfg(windows)]
     {
@@ -822,10 +800,10 @@ fn set_window_horizontal_offset(app: AppHandle, offset_x: f64) -> Result<(), Str
                 SetWindowPos(
                     raw_ptr,
                     std::ptr::null_mut(),
-                    target_x,
+                    x,
                     y,
-                    window_size.width as i32,
-                    window_size.height as i32,
+                    full_w_phys as i32,
+                    h_phys as i32,
                     0x0314, // SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED
                 );
             }
@@ -834,16 +812,27 @@ fn set_window_horizontal_offset(app: AppHandle, offset_x: f64) -> Result<(), Str
     }
 
     window
-        .set_position(PhysicalPosition::new(target_x, y))
+        .set_position(PhysicalPosition::new(x, y))
         .map_err(|e| e.to_string())?;
 
     Ok(())
 }
 
-/// Reset the window horizontal position back to exact top-center.
+/// Update island horizontal offset in memory for hit-test calculations
+#[tauri::command]
+fn set_window_horizontal_offset(offset_x: f64) -> Result<(), String> {
+    ISLAND_OFFSET_X.store(offset_x.round() as i32, Ordering::Relaxed);
+    Ok(())
+}
+
+/// Reset the window horizontal offset back to exact center.
 #[tauri::command]
 fn reset_window_horizontal_offset(app: AppHandle) -> Result<(), String> {
-    set_window_horizontal_offset(app, 0.0)
+    ISLAND_OFFSET_X.store(0, Ordering::Relaxed);
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = position_top_center(&window);
+    }
+    Ok(())
 }
 
 // ============================================
@@ -1228,8 +1217,10 @@ fn start_cursor_hit_test(window: tauri::WebviewWindow) {
                 }
             };
 
-            let left = (win_w_logical - target_w) / 2.0;
-            let right = left + target_w;
+            let offset_x = ISLAND_OFFSET_X.load(Ordering::Relaxed) as f64;
+            let center_x = (win_w_logical / 2.0) + offset_x;
+            let left = center_x - (target_w / 2.0);
+            let right = center_x + (target_w / 2.0);
             let margin = 10.0;
 
             let on_island = cx >= (left - margin)
@@ -1316,9 +1307,16 @@ fn switch_monitor(app: AppHandle) -> Result<String, String> {
 
     let monitor_size = target_monitor.size();
     let monitor_position = target_monitor.position();
+    let scale = window.scale_factor().unwrap_or(1.0);
 
-    let x = monitor_position.x + ((monitor_size.width as i32 - win_size.width as i32) / 2);
+    let full_w_phys = monitor_size.width;
+    let h_phys = (260.0 * scale).round() as u32;
+
+    let _ = window.set_size(PhysicalSize::new(full_w_phys, h_phys));
+
+    let x = monitor_position.x;
     let y = monitor_position.y;
+    ISLAND_OFFSET_X.store(0, Ordering::Relaxed);
 
     #[cfg(windows)]
     {
@@ -1341,8 +1339,8 @@ fn switch_monitor(app: AppHandle) -> Result<String, String> {
                     std::ptr::null_mut(),
                     x,
                     y,
-                    win_size.width as i32,
-                    win_size.height as i32,
+                    full_w_phys as i32,
+                    h_phys as i32,
                     0x0314, // SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED
                 );
             }
