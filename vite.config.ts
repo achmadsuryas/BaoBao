@@ -1,7 +1,8 @@
 import { defineConfig } from "vite";
-import { resolve } from "node:path";
-import process from "node:process";
-const host = process.env.TAURI_DEV_HOST;
+
+const host = (
+  globalThis as { process?: { env?: Record<string, string | undefined> } }
+).process?.env?.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(() => ({
@@ -13,10 +14,10 @@ export default defineConfig(() => ({
     host: host || false,
     hmr: host
       ? {
-          protocol: "ws",
-          host,
-          port: 1421,
-        }
+        protocol: "ws",
+        host,
+        port: 1421,
+      }
       : undefined,
     watch: {
       ignored: ["**/src-tauri/**"],

@@ -21,49 +21,48 @@
 
 ## 📖 Apa itu BaoBao?
 
-**BaoBao (宝宝)** adalah aplikasi *desktop widget* mengambang yang terinspirasi dari konsep **Dynamic Island**, dirancang khusus untuk mempercantik desktop Anda sekaligus meningkatkan produktivitas harian baik di **Windows** maupun **macOS**.
+**BaoBao (宝宝)** adalah aplikasi *desktop notch & dynamic island widget* yang imut, elegan, dan ringan untuk **Windows** maupun **macOS**.
 
-BaoBao dapat mengecil menjadi kapsul pil mini yang tenang atau melebar (*expand*) menjadi pusat kendali multifungsi hanya dengan satu klik atau hover.
+BaoBao dapat tampil menempel di bagian atas layar layaknya *Notch* maupun mengambang (*Floating Notch*), mengecil menjadi kapsul *mini-pill* yang ringkas, dan melebar (*expand*) menjadi pusat kendali produktivitas multifungsi hanya dengan *hover* atau klik.
 
 ---
 
 ## ✨ Fitur-Fitur Utama
 
-### 🎵 1. Music Player & Synced Lyrics
-- **Real-time Synced Lyrics**: Menampilkan lirik lagu yang sedang berputar secara sinkron baris demi baris, baik pada header pil mini maupun tampilan lirik penuh (*Full Lyrics Stream*).
-- **Audio Controls & Sound Wave**: Tombol Play/Pause, Next, Previous, slider volume terintegrasi, dan visualizer audio soundwave yang hidup.
-- **Sleepy BaoBao (Idle State)**: Saat musik tidak diputar lebih dari beberapa saat, maskot BaoBao akan tertidur pulas lengkap dengan animasi awan `zZz` yang menggemaskan.
+### 🎵 1. Music Player & Real-time Synced Lyrics
+- **Real-time Synced Lyrics**: Menampilkan lirik lagu secara sinkron baris demi baris di **Mini-Pill**, panel lirik samping (*Side Lyrics*), maupun mode lirik penuh (*Full Lyrics Stream*).
+- **Kontrol Media & Volume Native**: Tombol *Play/Pause*, *Previous*, *Next*, *progress bar* interaktif (*seek*), serta pengatur volume *master* (mendukung *mouse wheel scroll*).
+- **Smart Sound Wave & Sleepy BaoBao**: Visualizer gelombang suara yang hanya tampil saat ada musik aktif, serta animasi maskot BaoBao tertidur (`zZz`) saat tidak ada lagu yang diputar.
 
-### 🗄️ 2. Shelf (Desktop Stash & Quick Launcher)
-- **Drag & Drop Tray**: Tarik dan lepaskan (*drag & drop*) file, folder, dokumen, atau shortcut aplikasi langsung ke pulau untuk disimpan sementara.
-- **Dual Display Mode**: Pilihan tampilan **Slider View** (scroll horizontal modern) atau **Grid View** (tata letak rapi ke bawah).
-- Desktop Anda tetap bersih dan rapi tanpa berserakan file sementara!
+### 📝 2. Quick Notes & To-Do Minimalis
+- **Modern Minimalist Notes**: Buat catatan cepat atau daftar tugas (*to-do list*) dengan tampilan kartu minimalis modern.
+- **Smart Draft & Tenggat Waktu**: Dilengkapi penanda selesai (*checklist*), pemilih tanggal tenggat (*due date*), serta pembatalan draf otomatis jika menekan *New* lalu kembali tanpa menyimpan.
 
-### 📝 3. Catatan Cepat & To-Do (Notes)
-- Buat catatan ide spontan atau daftar tugas (*to-do list*) tanpa membuka aplikasi berat.
-- Dilengkapi penanggalan otomatis, fitur tenggat waktu (*due date picker*), dan penanda selesai (*checklist complete*).
+### ⏱️ 3. Focus Time & Stopwatch
+- **Focus Timer (Menit & Detik Kustom)**: Pilihan durasi cepat (`10m`, `15m`, `25m`, `45m`, `60m`) serta input durasi kustom hingga satuan **menit dan detik (`m : s`)**.
+- **Stopwatch & Lap Splits**: Stopwatch presisi tinggi di halaman yang sama lengkap dengan pencatat *Lap* otomatis yang rapi.
+- **Indikator Mini-Pill Realtime & Independen**: Timer dan Stopwatch dapat berjalan bersamaan tanpa ter-*pause* saat berpindah tab, masing-masing menampilkan indikator waktu *real-time* tersendiri di *mini-pill*.
+- **Notifikasi Focus Selesai**: Alarm suara 3x berulang dan notifikasi visual selama 5 detik di *mini-pill* tanpa bertabrakan dengan lirik lagu.
 
-### 🎨 4. Kustomisasi Tema, Warna, & Animasi
-- **Pilihan Warna Aksen (Color)**:
-  - 🔘 *Slate Gray* (Elegan & Netral)
-  - 🌸 *Sakura Pink* (Lembut & Ceria)
-  - 💎 *Neon Cyan* (Futuristik & Modern)
-  - 🍃 *Emerald Green* (Segar & Sejuk)
-  - 🌅 *Sunset Amber* (Hangat & Menawan)
-  - ☀️ *Solar Gold* (Mewah & Berenergi)
-  - 🎨 *Custom Color Picker & Eyedropper Pipette*: Bebas memilih kode warna HEX apa saja melalui dialog palet warna atau mengambil warna langsung dari layar desktop dengan pipet.
-- **Pilihan Tema Latar (Theme)**:
-  - 🪟 *Default*: Tampilan kaca minimalis modern (*glassmorphism*).
-  - 🌸 *Sakura*: Nuansa dahan bunga Sakura Jepang dengan aksen lembut.
-  - 🏔️ *Mountain*: Pemandangan siluet pegunungan Jepang yang menenangkan.
-  - 🎨 *Color*: Kustom warna background pulau sesuka hati menggunakan color picker & eyedropper.
-  - 🎚️ *Artwork Opacity*: Atur transparansi gambar latar belakang sesuai kenyamanan mata.
-- **Slider Durasi Animasi (Speed)**: Sesuaikan kecepatan animasi buka/tutup dan pergantian tab (*hover speed*) dari 0.15s hingga 0.90s.
-- **Multi-Bahasa**: Dukungan Bahasa Indonesia, English, 日本語 (Japanese), dan 中文 (Chinese).
-- **Audio SFX**: Efek suara interaktif saat tombol ditekan (dapat diaktifkan/dinonaktifkan).
-- **Start on Boot**: Opsi untuk otomatis berjalan saat PC/laptop Anda pertama kali dinyalakan.
-- **Shortcut Keyboard Global**: Sembunyikan atau tampilkan BaoBao secara instan dengan satu tombol (default tombol `` ` ``).
-- **Reset Settings Modal**: Kembalikan semua pengaturan ke setelan pabrik kapan saja dengan dialog konfirmasi yang aman.
+### 📅 4. Interactive Calendar & Event Reminder
+- **Kalender Bulanan & Pilih Cepat Tahun/Bulan**: Navigasi bulan dan tahun secara instan melalui **Grid 12 Bulan** atau ketik/scroll langsung angka tahunnya tanpa perlu menekan `<` `>` berulang kali.
+- **Pengingat Acara (Jam Spesifik / Seharian)**: Tandai acara di tanggal mana saja dengan opsi jam notifikasi (`HH:MM`, default `00:00`) atau mode seharian (*All Day*).
+- **Notifikasi Otomatis & Auto-Clean**: Saat tanggal dan jam acara tiba, muncul pengingat di *mini-pill* selama 5 detik disertai alarm 3x, lalu acara yang sudah lewat tanggal/jamnya otomatis dibersihkan dari daftar.
+
+### 🔋 5. Indikator Baterai & Kustomisasi Menu Bar
+- **4-Bar Stepped Battery Icon**: Indikator baterai laptop bergaya bar di sebelah *visualizer* lengkap dengan ikon petir saat *charging*.
+- **Pengaturan Menu Bar**: Atur tab mana saja yang ingin ditampilkan di Notch (**Music**, **Notes**, **Focus**, **Calendar**, serta **Battery Status**) langsung dari menu **Settings → Menu Bar**.
+
+### 🎨 6. Kustomisasi Tampilan, Floating Settings, & Multi-Monitor
+- **Draggable Floating Settings Window**: Jendela pengaturan bergaya macOS yang terpisah dari Notch dan bebas digeser ke mana saja di layar.
+- **Appearance & Custom Color Picker**:
+  - Pilihan *Preset Color Swatches*, **2D Saturation-Value Palette**, **Rainbow Hue Slider**, input kode **HEX**, dan **Eyedropper** lintas platform.
+  - **Adaptive Dark Contrast**: Teks dan ikon otomatis tetap jelas terbaca meskipun memilih warna tema yang sangat gelap.
+  - **Glass Mode**: Opsi tampilan transparan *glassmorphism* modern.
+- **Floating Notch & Posisi Horizontal**: Opsi tampilan Notch menempel di atas atau mengambang (*Floating Notch*), serta bebas digeser ke kiri/kanan di sepanjang layar.
+- **Open Mode (Hover / Click) & Hover Delay**: Pilih cara membuka Notch (otomatis saat *hover* dengan jeda milidetik yang bisa diatur, atau dengan klik).
+- **Multi-Monitor & Multi-Bahasa**: Pindahkan Notch antar-monitor dengan 1 klik, serta dukungan **English**, **Bahasa Indonesia**, **日本語**, dan **中文**.
+- **Audio SFX, Start on Boot, & Global Shortcut**: Efek suara interaktif, opsi menyala otomatis saat *booting*, dan tombol *shortcut* global untuk menyembunyikan/menampilkan BaoBao (default `` ` ``).
 
 ---
 
@@ -117,10 +116,10 @@ Anda dapat langsung mengunduh file installer resmi BaoBao melalui tombol direct 
 
 ## 🎮 Cara Menggunakan BaoBao
 
-- **Buka / Tutup Pulau**: Klik atau arahkan kursor ke kapsul pil untuk membuka kontrol lengkap. Klik di luar atau tekan tombol shortcut untuk menyembunyikannya.
-- **Memindahkan Posisi**: Tahan klik kiri pada header / area kosong widget, lalu geser ke posisi mana pun di monitor Anda.
-- **Sematkan Terbuka (Pin)**: Tekan ikon jarum/pin 📌 di pojok kanan atas agar pulau tidak otomatis menutup saat kursor keluar.
-- **Navigasi Tab**: Gunakan tombol panah `‹` dan `›` atau titik indikator di bawah untuk berganti antara **Musik**, **Shelf**, **Catatan**, dan **Pengaturan**.
+- **Buka / Tutup Notch**: Arahkan kursor (*Hover*) atau klik pada kapsul *mini-pill* untuk membuka kontrol lengkap. Geser kursor keluar untuk menutupnya kembali.
+- **Memindahkan Posisi**: Tahan klik kiri pada area kosong Notch untuk menggesernya ke kiri/kanan di sepanjang layar, atau geser jendela **Settings** secara bebas ke posisi mana pun di layar.
+- **Sematkan Terbuka (Pin)**: Tekan ikon pin 📌 di pojok kanan atas agar Notch tetap terbuka meskipun kursor keluar.
+- **Navigasi Tab**: Gunakan *navbar* di bagian bawah Notch (atau *scroll* roda mouse) untuk berpindah antara **Music**, **Notes**, **Focus**, **Calendar**, serta tombol **Settings**.
 
 ---
 

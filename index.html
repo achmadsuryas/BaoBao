@@ -10,14 +10,14 @@
   <body>
     <div id="baobao-container">
       <div id="island" class="collapsed">
-        <!-- Background Theme Decor Layer -->
+        <!-- Background Theme Gradient Layer (Image 1 Style) -->
         <div id="island-theme-decor" class="island-theme-decor"></div>
 
-        <!-- Top Bar / Pill Header -->
+        <!-- Top Bar / Notch Header -->
         <div class="island-header">
           <div class="header-left">
             <!-- Cute Baobao Dumpling Mascot Logo -->
-            <div class="baobao-logo" title="Baobao">
+            <div class="baobao-logo" title="BaoBao">
               <svg class="baobao-dumpling-svg" viewBox="0 0 32 30" width="24" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path class="dumpling-body" d="M16 2.4 C14.7 2.4 13.9 3.8 12.8 4.4 C11.4 5.1 9.6 5.0 8.4 6.2 C5.8 8.4 2.8 12.2 2.8 16.5 C2.8 23.2 8.6 28 16 28 C23.4 28 29.2 23.2 29.2 16.5 C29.2 12.2 26.2 8.4 23.6 6.2 C22.4 5.0 20.6 5.1 19.2 4.4 C18.1 3.8 17.3 2.4 16 2.4 Z" fill="currentColor" />
                 <path class="dumpling-crease" d="M16 5.5 V9.2 M12.6 6.6 L10.6 9.8 M19.4 6.6 L21.4 9.8" stroke="rgba(255, 255, 255, 0.5)" stroke-width="1.3" stroke-linecap="round" />
@@ -27,13 +27,27 @@
                 <span class="baobao-eye right"></span>
               </div>
             </div>
-            <span id="header-category" class="header-category"></span>
+            <span id="header-category" class="header-category">Music <span class="header-category-accent">Player</span></span>
           </div>
 
           <div class="header-center">
             <span class="pill-clock">21:20</span>
             <div id="pill-lyrics-container" class="pill-lyrics-container" style="display: none;">
               <span id="pill-lyric-text" class="pill-lyric-text">In My Blood</span>
+            </div>
+            <div id="pill-focus-alert" class="pill-focus-alert" style="display: none;">
+              <svg id="pill-alert-icon-bell" class="pill-focus-alert-icon" width="11.5" height="11.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <svg id="pill-alert-icon-cal" class="pill-focus-alert-icon" width="11.5" height="11.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <rect x="3" y="4" width="18" height="18" rx="3" ry="3"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span id="pill-alert-badge" class="pill-alert-badge" style="display: none;">09:00</span>
+              <span id="pill-focus-alert-text" class="pill-focus-alert-text">Focus Time Up!</span>
             </div>
             <span id="full-datetime" class="full-datetime">Fri 23 Oct 2026 <strong>21:20</strong></span>
           </div>
@@ -45,42 +59,62 @@
               <span class="wave-bar"></span>
               <span class="wave-bar"></span>
             </div>
-            <!-- Pin Island Toggle (Keep Expanded) -->
-            <button id="btn-pin-island" class="btn-pin-header" title="Keep Island Expanded (Sematkan Selalu Terbuka)">
+
+            <!-- Laptop Battery Indicator (Exact Gambar 2 Stepped Battery Silhouette + 4 Bars / Centered Bolt) -->
+            <div id="header-battery" class="header-battery" title="Battery Status">
+              <svg class="battery-ref-svg" width="22" height="12" viewBox="0 0 27 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="battery-shell-path" d="M 1.5 2 H 22 V 5 H 25 V 10 H 22 V 13 H 1.5 Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
+                <g id="battery-segments">
+                  <rect class="battery-seg active" x="4.2" y="4.5" width="2.8" height="6" rx="0.5" fill="currentColor" />
+                  <rect class="battery-seg active" x="8.4" y="4.5" width="2.8" height="6" rx="0.5" fill="currentColor" />
+                  <rect class="battery-seg active" x="12.6" y="4.5" width="2.8" height="6" rx="0.5" fill="currentColor" />
+                  <rect class="battery-seg active" x="16.8" y="4.5" width="2.8" height="6" rx="0.5" fill="currentColor" />
+                </g>
+                <path id="battery-bolt-icon" class="battery-bolt-icon" d="M 12.6 3.3 L 8.6 8.1 H 11.6 L 10.7 11.7 L 14.7 6.9 H 11.7 Z" fill="currentColor" style="display: none;" />
+              </svg>
+            </div>
+
+            <!-- Realtime Focus Timer & Stopwatch Indicators (Right of Battery in Mini Pill, Distinct When Both Active) -->
+            <div id="header-timer-mini" class="header-focus-mini timer-mini" style="display: none;" title="Active Focus Timer">
+              <svg class="header-focus-mini-icon" width="9.5" height="9.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <polyline points="12 7 12 12 15.5 14"></polyline>
+              </svg>
+              <span id="header-timer-mini-time" class="header-focus-mini-time">25:00</span>
+            </div>
+
+            <div id="header-stopwatch-mini" class="header-focus-mini stopwatch-mini" style="display: none;" title="Active Stopwatch">
+              <svg class="header-focus-mini-icon" width="9.5" height="9.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2 2"></path>
+                <path d="M9 2h6"></path>
+                <path d="M12 2v3"></path>
+              </svg>
+              <span id="header-stopwatch-mini-time" class="header-focus-mini-time">00:00</span>
+            </div>
+
+            <!-- Top-right Pin Notch button -->
+            <button id="btn-pin-island" class="btn-pin-header" title="Keep Notch Expanded">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="17" x2="12" y2="22"></line>
                 <path d="M5 17h14v-2l-2-3V5a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v7l-2 3v2z"></path>
               </svg>
             </button>
-            <button id="btn-open-settings" class="btn-settings-header" title="Pengaturan (Settings)">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-              </svg>
-            </button>
           </div>
         </div>
 
-        <!-- Body Content (Folds open smoothly when expanded!) -->
+        <!-- Body Content -->
         <div class="island-body">
-          <!-- Left Arrow -->
-          <button id="btn-prev-slide" class="nav-arrow left-arrow" title="Previous view">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-
           <!-- Slides Viewport -->
           <div class="slides-wrapper">
-            <!-- Slide 1: Music Player -->
+            <!-- Slide 1: Music Player (Original Clean Layout) -->
             <div id="slide-music" class="slide active">
               <!-- Active Music Layout -->
               <div id="music-active-view" class="music-layout">
-                <!-- Album Art -->
                 <div class="album-art-wrapper">
                   <img id="album-cover-img" src="" alt="Album Art" class="album-cover" />
                   <div id="album-cover-fallback" class="album-cover fallback">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                       <path d="M9 18V5l12-2v13"></path>
                       <circle cx="6" cy="18" r="3"></circle>
                       <circle cx="18" cy="16" r="3"></circle>
@@ -88,7 +122,6 @@
                   </div>
                 </div>
 
-                <!-- Track Info & Controls -->
                 <div class="player-content">
                   <div class="track-meta">
                     <h4 id="track-title" class="track-title">In My Blood</h4>
@@ -105,57 +138,54 @@
 
                   <div class="controls-row">
                     <button id="btn-lyrics" class="ctrl-btn icon-btn" title="Toggle Lyrics">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                        <line x1="8" y1="9" x2="16" y2="9"></line>
-                        <line x1="8" y1="13" x2="14" y2="13"></line>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"></path>
                       </svg>
                     </button>
 
                     <div class="playback-controls">
                       <button id="btn-prev" class="ctrl-btn" title="Previous Track">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                           <polygon points="19 20 9 12 19 4 19 20"></polygon>
-                          <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line>
+                          <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5"></line>
                         </svg>
                       </button>
                       <button id="btn-play-pause" class="ctrl-btn play-btn" title="Play/Pause">
                         <svg id="icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                          <rect x="6" y="4" width="4" height="16" rx="1"></rect>
-                          <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+                          <rect x="6" y="4" width="4" height="16"></rect>
+                          <rect x="14" y="4" width="4" height="16"></rect>
                         </svg>
                         <svg id="icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
                           <polygon points="5 3 19 12 5 21 5 3"></polygon>
                         </svg>
                       </button>
                       <button id="btn-next" class="ctrl-btn" title="Next Track">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                           <polygon points="5 4 15 12 5 20 5 4"></polygon>
-                          <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line>
+                          <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5"></line>
                         </svg>
                       </button>
+                    </div>
 
-                      <!-- Integrated Master Volume Control -->
-                      <div class="volume-slider-group" id="volume-group" title="Volume (Scroll mouse to adjust)">
-                        <button id="btn-volume-mute" class="ctrl-btn" title="Mute/Unmute">
-                          <svg id="icon-vol-high" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                          </svg>
-                          <svg id="icon-vol-low" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                          </svg>
-                          <svg id="icon-vol-muted" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                            <line x1="23" y1="9" x2="17" y2="15"></line>
-                            <line x1="17" y1="9" x2="23" y2="15"></line>
-                          </svg>
-                        </button>
-                        <div id="volume-slider-track" class="volume-slider-track">
-                          <div id="volume-slider-fill" class="volume-slider-fill" style="width: 70%;"></div>
-                        </div>
+                    <div class="volume-slider-group" id="volume-group" title="Volume (Scroll mouse to adjust)">
+                      <button id="btn-volume-mute" class="ctrl-btn icon-btn" title="Mute/Unmute">
+                        <svg id="icon-vol-high" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                        </svg>
+                        <svg id="icon-vol-low" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        </svg>
+                        <svg id="icon-vol-muted" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                          <line x1="23" y1="9" x2="17" y2="15"></line>
+                          <line x1="17" y1="9" x2="23" y2="15"></line>
+                        </svg>
+                      </button>
+                      <div id="volume-slider-track" class="volume-slider-track">
+                        <div id="volume-slider-fill" class="volume-slider-fill" style="width: 70%;"></div>
                       </div>
                     </div>
                   </div>
@@ -203,7 +233,7 @@
                 </div>
               </div>
 
-              <!-- Dedicated In-Island Full Lyrics Mode -->
+              <!-- Dedicated In-Notch Full Lyrics Mode -->
               <div id="music-full-lyrics-view" class="music-full-lyrics-layout" style="display: none;">
                 <div class="full-lyrics-topbar">
                   <div class="full-lyrics-track-pill">
@@ -211,7 +241,7 @@
                     <span class="full-dot">-</span>
                     <span id="full-now-artist" class="full-now-artist">Shawn Mendes</span>
                   </div>
-                  <button id="btn-exit-full-lyrics" class="btn-exit-full-lyrics" title="Tutup lirik">
+                  <button id="btn-exit-full-lyrics" class="btn-exit-full-lyrics" title="Close lyrics">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                       <line x1="18" y1="6" x2="6" y2="18"></line>
                       <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -225,60 +255,16 @@
               </div>
             </div>
 
-            <!-- Slide 2: Shelf (Desktop Icon Stash & Launcher) -->
-            <div id="slide-shelf" class="slide">
-              <div id="shelf-drop-zone" class="shelf-zone">
-                <!-- Empty Placeholder -->
-                <div id="shelf-empty-state" class="shelf-empty-state">
-                  <div class="drop-tray-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="7 10 12 15 17 10"></polyline>
-                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                      <path d="M20 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"></path>
-                      <path d="M4 14h5l2 3h2l2-3h5"></path>
-                    </svg>
-                  </div>
-                  <h4 id="shelf-drop-title" class="drop-title">Drop files here</h4>
-                  <p id="shelf-drop-subtitle" class="drop-subtitle">Drag files / folders / apps to stash</p>
-                </div>
-
-                <!-- View Mode Switch: Slider vs Grid & Clear All -->
-                <div id="shelf-view-toggle" class="shelf-view-toggle-bar" style="display: none;">
-                  <button id="btn-shelf-clear-all" class="shelf-view-btn shelf-clear-btn" title="Clear all items (Hapus Semua)">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                    </svg>
-                  </button>
-                  <div class="shelf-toggle-sep"></div>
-                  <button id="btn-shelf-slider" class="shelf-view-btn active" title="Slider View (Scroll kesamping)">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-                      <circle cx="8" cy="12" r="2" fill="currentColor"></circle>
-                    </svg>
-                  </button>
-                  <button id="btn-shelf-grid" class="shelf-view-btn" title="Grid View (Grid kebawah)">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-                      <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-                      <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-                      <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-                    </svg>
-                  </button>
-                </div>
-
-                <!-- Grid of Desktop Items (Populated dynamically) -->
-                <div id="shelf-items-grid" class="shelf-items-grid mode-slider" style="display: none;">
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 2: Notes Tab (Catatan) -->
+            <!-- Slide 2: Ultra-Minimalist & Modern Notes Tab -->
             <div id="slide-notes" class="slide">
               <div id="notes-container" class="notes-container no-editor">
-                <!-- Left: Notes List & Quick New -->
+                <!-- Notes List View -->
                 <div class="notes-sidebar">
                   <div class="notes-sidebar-header">
-                    <span id="txt-notes-count" class="notes-count">0 Notes</span>
+                    <div class="notes-header-meta">
+                      <span class="notes-status-dot"></span>
+                      <span id="txt-notes-count" class="notes-count">0 Notes</span>
+                    </div>
                     <button id="btn-add-note" class="btn-notes-add" title="New Note">
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -292,28 +278,45 @@
                   </div>
                 </div>
 
-                <!-- Right: Note Editor -->
+                <!-- Minimalist Note Editor View -->
                 <div id="notes-editor" class="notes-editor" style="display: none;">
                   <div class="notes-editor-header">
-                    <button id="btn-back-to-notes" class="btn-note-header-action btn-back-note" title="Kembali ke Daftar">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                    <button id="btn-back-to-notes" class="btn-note-header-action btn-back-note" title="Back">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="15 18 9 12 15 6"></polyline>
                       </svg>
                     </button>
+                    <button id="btn-toggle-complete" class="btn-note-header-action btn-check-inline" title="Mark Completed">
+                      <svg id="icon-note-incomplete" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"></circle></svg>
+                      <svg id="icon-note-completed" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" style="display: none;"><circle cx="12" cy="12" r="9" fill="rgba(16, 185, 129, 0.2)"></circle><polyline points="8 12 11 15 16 9"></polyline></svg>
+                    </button>
                     <input type="text" id="note-title-input" class="note-title-input" placeholder="Title..." maxlength="60" />
                     <div class="notes-editor-actions">
-                      <button id="btn-toggle-complete" class="btn-note-header-action" title="Tandai Selesai">
-                        <svg id="icon-note-incomplete" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"></circle></svg>
-                        <svg id="icon-note-completed" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" style="display: none;"><circle cx="12" cy="12" r="9" fill="rgba(16, 185, 129, 0.2)"></circle><polyline points="8 12 11 15 16 9"></polyline></svg>
-                      </button>
+                      <div class="note-date-chip due clickable" id="chip-due-date" title="Due Date">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span id="note-due-display" class="note-chip-text">No deadline</span>
+                        <input type="date" id="note-due-picker" class="hidden-date-picker" />
+                        <button id="btn-clear-due" class="btn-chip-clear" style="display: none;" title="Clear due date">
+                          <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                      </div>
                       <button id="btn-delete-note" class="btn-note-del" title="Delete Note">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
                           <polyline points="3 6 5 6 21 6"></polyline>
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                         </svg>
                       </button>
-                      <button id="btn-close-note" class="btn-note-header-action btn-close-editor" title="Tutup Editor">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <button id="btn-save-note" class="btn-note-save" title="Save Note">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span id="txt-btn-save-note">Save</span>
+                      </button>
+                      <button id="btn-close-note" class="btn-note-header-action btn-close-editor" title="Close Editor" style="display: none;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                           <line x1="18" y1="6" x2="6" y2="18"></line>
                           <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
@@ -324,314 +327,516 @@
                   <textarea id="note-body-input" class="note-body-input" placeholder="Write details here..."></textarea>
 
                   <div class="notes-editor-footer">
-                    <div class="note-dates-group">
-                      <!-- Created Date (Readonly / Disabled) -->
-                      <div class="note-date-chip readonly" id="chip-created-date" title="Tanggal Dibuat">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                          <line x1="16" y1="2" x2="16" y2="6"></line>
-                          <line x1="8" y1="2" x2="8" y2="6"></line>
-                          <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                        <span id="note-created-display" class="note-chip-text">--</span>
-                      </div>
+                    <div class="note-date-chip readonly" id="chip-created-date" title="Date Created">
+                      <span id="note-created-display" class="note-chip-text">--</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                      <!-- Optional Deadline / Due Date (Calendar Popup Picker) -->
-                      <div class="note-date-chip due clickable" id="chip-due-date" title="Tenggat Waktu (Klik untuk pilih kalender)">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Slide 3: Elegant Focus Time & Stopwatch -->
+            <div id="slide-focus" class="slide">
+              <div class="focus-layout">
+                <!-- Left: Glowing Circular Chronograph Ring -->
+                <div id="focus-ring-wrapper" class="focus-ring-wrapper">
+                  <svg class="focus-ring-svg" width="96" height="96" viewBox="0 0 96 96">
+                    <circle class="focus-ring-halo" cx="48" cy="48" r="43" fill="none" stroke-width="1"></circle>
+                    <circle class="focus-ring-ticks" cx="48" cy="48" r="39" fill="none" stroke-width="3" stroke-dasharray="1.5 6.67"></circle>
+                    <circle class="focus-ring-bg" cx="48" cy="48" r="39" fill="none" stroke-width="4.5"></circle>
+                    <circle id="focus-ring-progress" class="focus-ring-progress" cx="48" cy="48" r="39" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="245.04" stroke-dashoffset="0"></circle>
+                  </svg>
+                  <div class="focus-ring-center">
+                    <div class="focus-time-row">
+                      <span id="focus-time-display" class="focus-time-display">25:00</span>
+                      <span id="focus-ms-display" class="focus-ms-display" style="display: none;">.00</span>
+                    </div>
+                    <span id="focus-state-badge" class="focus-state-badge">TIMER</span>
+                  </div>
+                </div>
+
+                <!-- Right: Timer / Stopwatch Switcher, Presets/Laps & Controls -->
+                <div class="focus-content">
+                  <div class="focus-top-row">
+                    <div class="focus-mode-pills">
+                      <button type="button" class="focus-mode-pill active" data-focus-mode="timer" id="btn-focus-mode-timer">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                           <circle cx="12" cy="12" r="10"></circle>
                           <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
-                        <span id="note-due-display" class="note-chip-text">Tanpa tenggat</span>
-                        <input type="date" id="note-due-picker" class="hidden-date-picker" />
-                        <button id="btn-clear-due" class="btn-chip-clear" style="display: none;" title="Hapus tenggat">
-                          <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                        </button>
-                      </div>
+                        <span id="txt-focus-tab-timer">Timer</span>
+                      </button>
+                      <button type="button" class="focus-mode-pill" data-focus-mode="stopwatch" id="btn-focus-mode-stopwatch">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="13" r="8"></circle>
+                          <path d="M12 9v4l2 2"></path>
+                          <path d="M9 2h6"></path>
+                          <path d="M12 2v3"></path>
+                        </svg>
+                        <span id="txt-focus-tab-stopwatch">Stopwatch</span>
+                      </button>
                     </div>
+                  </div>
 
-                    <button id="btn-save-note" class="btn-note-save" title="Save Note">
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
+                  <!-- Timer Mode Row: Quick Duration Chips + Custom Min:Sec Input + Stepper -->
+                  <div id="focus-presets-row" class="focus-presets-row">
+                    <button type="button" class="focus-preset-chip" data-mins="10">10m</button>
+                    <button type="button" class="focus-preset-chip" data-mins="15">15m</button>
+                    <button type="button" class="focus-preset-chip active" data-mins="25">25m</button>
+                    <button type="button" class="focus-preset-chip" data-mins="45">45m</button>
+                    <button type="button" class="focus-preset-chip" data-mins="60">60m</button>
+                    <div class="focus-step-btns">
+                      <button type="button" id="btn-focus-minus" class="focus-step-btn" title="-1 min">−</button>
+                      <div class="focus-custom-wrap" title="Custom Duration (Minutes : Seconds)">
+                        <input type="number" id="input-focus-custom-mins" class="input-focus-custom-mins" min="0" max="999" value="25" />
+                        <span class="focus-custom-unit">m</span>
+                        <span class="focus-custom-sep">:</span>
+                        <input type="number" id="input-focus-custom-secs" class="input-focus-custom-secs" min="0" max="59" value="00" />
+                        <span class="focus-custom-unit">s</span>
+                      </div>
+                      <button type="button" id="btn-focus-plus" class="focus-step-btn" title="+1 min">+</button>
+                    </div>
+                  </div>
+
+                  <!-- Stopwatch Mode Row: Recorded Laps Strip (Same Page) -->
+                  <div id="focus-laps-row" class="focus-laps-row" style="display: none;">
+                    <div id="focus-laps-list" class="focus-laps-list">
+                      <span id="txt-focus-laps-empty" class="focus-laps-empty">Press Lap while running to record splits</span>
+                    </div>
+                  </div>
+
+                  <div class="focus-controls-row">
+                    <button type="button" id="btn-focus-toggle" class="btn-focus-primary">
+                      <svg id="icon-focus-play" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
                       </svg>
-                      <span id="txt-btn-save-note">Save</span>
+                      <svg id="icon-focus-pause" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                      </svg>
+                      <span id="txt-focus-toggle-btn">Start Focus</span>
+                    </button>
+                    <button type="button" id="btn-focus-lap" class="btn-focus-lap" style="display: none;" title="Record Lap">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                        <line x1="4" y1="22" x2="4" y2="15"></line>
+                      </svg>
+                      <span id="txt-focus-lap-btn">Lap</span>
+                    </button>
+                    <button type="button" id="btn-focus-reset" class="btn-focus-secondary" title="Reset">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <polyline points="3 3 3 8 8 8"></polyline>
+                      </svg>
                     </button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Slide 3: Settings (Pengaturan) -->
-            <div id="slide-settings" class="slide">
-              <div class="settings-container">
-                <!-- Left: Toggles & Language Dropdown -->
-                <div class="settings-col">
-                  <div class="settings-item">
-                    <div class="settings-meta">
-                      <div class="settings-icon">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                        </svg>
-                      </div>
-                      <div class="settings-texts">
-                        <span id="txt-sfx-label" class="settings-label">Sound Effects</span>
-                        <span id="txt-sfx-desc" class="settings-desc">UI click audio</span>
-                      </div>
-                    </div>
-                    <label class="toggle-switch" title="Toggle SFX">
-                      <input type="checkbox" id="toggle-sfx" checked />
-                      <span class="toggle-slider"></span>
-                    </label>
-                  </div>
-
-                  <div class="settings-item">
-                    <div class="settings-meta">
-                      <div class="settings-icon">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M9 18V5l12-2v13"></path>
-                          <circle cx="6" cy="18" r="3"></circle>
-                          <circle cx="18" cy="16" r="3"></circle>
-                        </svg>
-                      </div>
-                      <div class="settings-texts">
-                        <span id="txt-lyrics-label" class="settings-label">Mini Pill Lyrics</span>
-                        <span id="txt-lyrics-desc" class="settings-desc">Show when minimized</span>
-                      </div>
-                    </div>
-                    <label class="toggle-switch" title="Toggle mini lyrics">
-                      <input type="checkbox" id="toggle-mini-lyrics" checked />
-                      <span class="toggle-slider"></span>
-                    </label>
-                  </div>
-
-                  <div class="settings-item settings-item-compact">
-                    <div class="settings-meta">
-                      <div class="settings-icon">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <line x1="2" y1="12" x2="22" y2="12"></line>
-                          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                        </svg>
-                      </div>
-                      <div class="settings-texts">
-                        <span id="txt-lang-label" class="settings-label">Language</span>
-                        <span id="txt-lang-desc" class="settings-desc">Display language</span>
-                      </div>
-                    </div>
-                    <div class="custom-select-wrapper">
-                      <select id="select-language" class="settings-select">
-                        <option value="en" selected>English</option>
-                        <option value="id">Indonesia</option>
-                        <option value="ja">日本語</option>
-                        <option value="zh">中文</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- Start on Boot under Language -->
-                  <div class="settings-item">
-                    <div class="settings-meta">
-                      <div class="settings-icon">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
-                          <line x1="12" y1="2" x2="12" y2="12"></line>
-                        </svg>
-                      </div>
-                      <div class="settings-texts">
-                        <span id="txt-autostart-label" class="settings-label">Start on Boot</span>
-                        <span id="txt-autostart-desc" class="settings-desc">Launch on PC startup</span>
-                      </div>
-                    </div>
-                    <label class="toggle-switch" title="Launch automatically on Windows startup">
-                      <input type="checkbox" id="toggle-autostart" checked />
-                      <span class="toggle-slider"></span>
-                    </label>
-                  </div>
-
-                  <!-- Switch Display / Monitor Item -->
-                  <div id="settings-item-monitor" class="settings-item settings-item-compact">
-                    <div class="settings-meta">
-                      <div class="settings-icon">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                          <line x1="8" y1="21" x2="16" y2="21"></line>
-                          <line x1="12" y1="17" x2="12" y2="21"></line>
-                        </svg>
-                      </div>
-                      <div class="settings-texts">
-                        <span id="txt-monitor-label" class="settings-label">Display Monitor</span>
-                        <span id="txt-monitor-desc" class="settings-desc">Switch screen</span>
-                      </div>
-                    </div>
-                    <button id="btn-switch-monitor" class="btn-setting-action" title="Pindah ke monitor lain (Tengah Atas)">
-                      <span id="txt-current-monitor">Monitor 1 ⇄</span>
+            <!-- Slide 4: Interactive Calendar & Event Reminder -->
+            <div id="slide-calendar" class="slide">
+              <div class="cal-layout">
+                <!-- Left: Mini Month Grid + Fast Month/Year Picker -->
+                <div class="cal-grid-pane">
+                  <div class="cal-month-header">
+                    <button type="button" id="btn-cal-prev" class="cal-nav-btn" title="Previous Month">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
-                  </div>
-
-                  <!-- Horizontal Position / Reset Center Item -->
-                  <div id="settings-item-position" class="settings-item settings-item-compact">
-                    <div class="settings-meta">
-                      <div class="settings-icon">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="5 9 2 12 5 15"></polyline>
-                          <polyline points="19 9 22 12 19 15"></polyline>
-                          <line x1="2" y1="12" x2="22" y2="12"></line>
-                        </svg>
-                      </div>
-                      <div class="settings-texts">
-                        <span id="txt-position-label" class="settings-label">Position</span>
-                        <span id="txt-position-desc" class="settings-desc">Drag left / right</span>
-                      </div>
+                    <div class="cal-header-center">
+                      <button type="button" id="btn-cal-month-picker" class="cal-month-pick-btn" title="Choose Month & Year">
+                        <span id="txt-cal-month-name">Nov</span>
+                        <svg class="cal-month-caret" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                      </button>
+                      <input type="number" id="input-cal-year" class="cal-year-input" min="1970" max="2100" value="2026" title="Type or scroll to change Year" />
                     </div>
-                    <button id="btn-reset-position" class="btn-setting-action" title="Reset island position to center">
-                      <span id="txt-reset-pos-btn">Reset</span>
-                    </button>
-                  </div>
-
-                  <!-- Hide / Show Keyboard Shortcut Item -->
-                  <div id="settings-item-shortcut" class="settings-item settings-item-compact">
-                    <div class="settings-meta">
-                      <div class="settings-icon">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
-                          <line x1="6" y1="8" x2="6" y2="8"></line>
-                          <line x1="10" y1="8" x2="10" y2="8"></line>
-                          <line x1="14" y1="8" x2="14" y2="8"></line>
-                          <line x1="18" y1="8" x2="18" y2="8"></line>
-                          <line x1="6" y1="12" x2="6" y2="12"></line>
-                          <line x1="18" y1="12" x2="18" y2="12"></line>
-                          <line x1="10" y1="16" x2="14" y2="16"></line>
-                        </svg>
-                      </div>
-                      <div class="settings-texts">
-                        <span id="txt-shortcut-label" class="settings-label">Hide / Show Key</span>
-                        <span id="txt-shortcut-desc" class="settings-desc">Shortcut keyboard</span>
-                      </div>
-                    </div>
-                    <button id="btn-shortcut-key" class="btn-setting-action btn-shortcut-pill" title="Klik untuk mengganti shortcut keyboard">
-                      <span id="txt-shortcut-key-display">`</span>
-                    </button>
-                  </div>
-
-                  <!-- Animation Duration Slider (Hover & Open Speed) -->
-                  <div id="settings-item-anim-speed" class="settings-item settings-item-compact">
-                    <div class="settings-meta">
-                      <div class="settings-icon">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                      </div>
-                      <div class="settings-texts">
-                        <span id="txt-anim-speed-label" class="settings-label">Animation Speed</span>
-                        <span id="txt-anim-speed-desc" class="settings-desc">Hover & open duration</span>
-                      </div>
-                    </div>
-                    <div class="anim-speed-control">
-                      <span id="txt-anim-speed-val" class="anim-speed-val">0.45s</span>
-                      <input type="range" id="slider-anim-speed" min="150" max="900" step="50" value="450" class="theme-opacity-slider anim-slider" />
+                    <div class="cal-header-right">
+                      <button type="button" id="btn-cal-today" class="cal-today-btn" title="Go to Today">•</button>
+                      <button type="button" id="btn-cal-next" class="cal-nav-btn" title="Next Month">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                      </button>
                     </div>
                   </div>
 
-                  <!-- Reset All Settings to Default -->
-                  <div id="settings-item-reset-all" class="settings-item settings-item-compact">
-                    <div class="settings-meta">
-                      <div class="settings-icon danger-icon">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                          <path d="M3 3v5h5"></path>
-                        </svg>
-                      </div>
-                      <div class="settings-texts">
-                        <span id="txt-reset-all-label" class="settings-label">Reset Settings</span>
-                        <span id="txt-reset-all-desc" class="settings-desc">Restore all defaults</span>
-                      </div>
+                  <!-- Standard Days View -->
+                  <div id="cal-days-view" class="cal-days-view">
+                    <div id="cal-weekdays-row" class="cal-weekdays-row">
+                      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
                     </div>
-                    <button id="btn-reset-all-settings" class="btn-setting-action btn-danger-pill" title="Reset semua pengaturan BaoBao ke awal (dengan konfirmasi)">
-                      <span id="txt-reset-all-btn">Reset</span>
-                    </button>
+                    <div id="cal-days-grid" class="cal-days-grid">
+                      <!-- Populated dynamically -->
+                    </div>
+                  </div>
+
+                  <!-- Fast Month & Year Picker Overlay -->
+                  <div id="cal-picker-view" class="cal-picker-view" style="display: none;">
+                    <div class="cal-picker-year-bar">
+                      <button type="button" id="btn-cal-year-prev" class="cal-year-step-btn" title="-1 Year">‹</button>
+                      <input type="number" id="input-cal-picker-year" class="cal-picker-year-input" min="1970" max="2100" value="2026" />
+                      <button type="button" id="btn-cal-year-next" class="cal-year-step-btn" title="+1 Year">›</button>
+                    </div>
+                    <div id="cal-months-grid" class="cal-months-grid">
+                      <!-- 12 months populated dynamically -->
+                    </div>
                   </div>
                 </div>
 
-                <!-- Divider -->
-                <div class="settings-divider"></div>
-
-                <!-- Right: Color & Theme Picker -->
-                <div class="settings-col settings-theme-col">
-                  <!-- 1. Color Picker -->
-                  <div class="theme-header">
-                    <span id="txt-theme-label" class="settings-label">Color</span>
+                <!-- Right: Ultra-Minimalist Selected Date Events & Composer -->
+                <div class="cal-events-pane">
+                  <div class="cal-selected-header">
+                    <div class="cal-selected-meta">
+                      <span id="txt-cal-selected-date" class="cal-selected-date">Sun, 8 Nov 2026</span>
+                    </div>
+                    <span id="txt-cal-events-count" class="cal-events-count">0 Events</span>
                   </div>
 
-                  <!-- Modern Custom Color Picker Box with EyeDropper -->
-                  <div class="color-picker-control">
-                    <label class="color-picker-swatch-wrap" title="Klik untuk pilih warna kustom (Color Dialog)">
-                      <input type="color" id="input-custom-color" value="#06b6d4" class="hidden-color-input" />
-                      <span id="color-swatch-current" class="color-swatch-preview"></span>
-                      <span id="txt-color-hex-val" class="color-hex-text">#06B6D4</span>
-                    </label>
-
-                    <button id="btn-eyedropper" class="btn-eyedropper" title="Ambil warna dari layar / UI (Eyedropper Pipette)">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"></path>
-                        <path d="m5 2 5 5"></path>
-                        <path d="m2 22 5.5-1.5L21.1 6.9a2.1 2.1 0 0 0 0-3l-1-1a2.1 2.1 0 0 0-3 0L3.5 16.5 2 22Z"></path>
-                        <circle cx="19" cy="5" r="1"></circle>
+                  <div class="cal-add-row">
+                    <input type="text" id="input-cal-event-title" class="cal-event-input" placeholder="Add event reminder..." maxlength="60" />
+                    <div class="cal-time-wrap" id="cal-time-wrap" title="Notification Time (HH:MM)">
+                      <button type="button" id="btn-cal-toggle-time" class="cal-time-toggle active" title="Toggle specific time / All Day">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="9"></circle>
+                          <polyline points="12 7 12 12 15 14"></polyline>
+                        </svg>
+                      </button>
+                      <div id="cal-time-inputs" class="cal-time-inputs">
+                        <input type="number" id="input-cal-hour" class="cal-time-num" min="0" max="23" value="00" title="Hour (00-23)" />
+                        <span class="cal-time-sep">:</span>
+                        <input type="number" id="input-cal-min" class="cal-time-num" min="0" max="59" value="00" title="Minute (00-59)" />
+                      </div>
+                      <span id="txt-cal-allday-chip" class="cal-allday-chip" style="display: none;">All Day</span>
+                    </div>
+                    <button type="button" id="btn-cal-add-event" class="btn-cal-add" title="Add Event">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
                       </svg>
                     </button>
                   </div>
 
+                  <div id="cal-events-list" class="cal-events-list">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Navbar -->
+        <div class="notch-bottom-navbar">
+          <div class="navbar-center-pills">
+            <!-- Tab 0: Music -->
+            <button id="nav-btn-music" class="notch-nav-item active" data-slide="0" title="Music">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+              </svg>
+              <span id="nav-pill-txt-music" class="notch-nav-label">Music</span>
+            </button>
+
+            <!-- Tab 1: Notes -->
+            <button id="nav-btn-notes" class="notch-nav-item" data-slide="1" title="Notes">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span id="nav-pill-txt-notes" class="notch-nav-label">Notes</span>
+            </button>
+
+            <!-- Tab 2: Focus Time -->
+            <button id="nav-btn-focus" class="notch-nav-item" data-slide="2" title="Focus Time">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2.5 2.5"></path>
+                <path d="M9 2h6"></path>
+              </svg>
+              <span id="nav-pill-txt-focus" class="notch-nav-label">Focus</span>
+            </button>
+
+            <!-- Tab 3: Calendar -->
+            <button id="nav-btn-calendar" class="notch-nav-item" data-slide="3" title="Calendar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span id="nav-pill-txt-calendar" class="notch-nav-label">Calendar</span>
+            </button>
+
+            <!-- Settings Window Toggle -->
+            <button id="btn-nav-settings" class="notch-nav-item icon-only" title="Settings">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================
+           Standalone Floating Settings Window (Clean, No Desc Subtitles)
+           ==================================================== -->
+      <div id="settings-window" class="settings-window" style="display: none;">
+        <!-- Left Sidebar -->
+        <div class="settings-win-sidebar" id="settings-drag-handle">
+          <div class="settings-win-traffic">
+            <button id="btn-close-settings-win" class="traffic-btn close" title="Close Settings">
+              <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="settings-nav-list">
+            <button class="settings-nav-item active" data-tab="general">
+              <span class="nav-icon-badge badge-gray">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+              </span>
+              <span id="nav-txt-general" class="nav-item-label">General</span>
+            </button>
+
+            <button class="settings-nav-item" data-tab="display">
+              <span class="nav-icon-badge badge-purple">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+              </span>
+              <span id="nav-txt-display" class="nav-item-label">Display</span>
+            </button>
+
+            <button class="settings-nav-item" data-tab="appearance">
+              <span class="nav-icon-badge badge-blue">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 2a10 10 0 0 1 0 20Z" fill="currentColor"></path>
+                </svg>
+              </span>
+              <span id="nav-txt-appearance" class="nav-item-label">Appearance</span>
+            </button>
+
+            <button class="settings-nav-item" data-tab="menubar">
+              <span class="nav-icon-badge badge-amber">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                  <line x1="8" y1="15" x2="10" y2="15"></line>
+                  <line x1="14" y1="15" x2="16" y2="15"></line>
+                </svg>
+              </span>
+              <span id="nav-txt-menubar" class="nav-item-label">Menu Bar</span>
+            </button>
+          </div>
+
+          <div class="settings-nav-footer">
+            <button class="settings-nav-item" data-tab="about">
+              <span class="nav-icon-badge badge-slate">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </span>
+              <span id="nav-txt-about" class="nav-item-label">About</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Content Area -->
+        <div class="settings-win-main">
+          <div class="settings-win-header" id="settings-main-drag-handle">
+            <h3 id="settings-pane-title" class="settings-pane-title">General</h3>
+          </div>
+
+          <div class="settings-win-body">
+            <!-- TAB 1: GENERAL (Includes Mini Pill Lyrics) -->
+            <div id="settings-tab-general" class="settings-tab-pane active">
+              <div class="settings-section-label" id="sec-lbl-system">System & Preferences</div>
+              <div class="settings-group-card">
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-lang-label" class="settings-label">Language</span>
+                  </div>
+                  <div class="custom-select-wrapper">
+                    <select id="select-language" class="settings-select">
+                      <option value="en" selected>English</option>
+                      <option value="id">Indonesia</option>
+                      <option value="ja">日本語</option>
+                      <option value="zh">中文</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-autostart-label" class="settings-label">Start on Boot</span>
+                  </div>
+                  <label class="toggle-switch" title="Launch automatically on startup">
+                    <input type="checkbox" id="toggle-autostart" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-sfx-label" class="settings-label">Sound Effects</span>
+                  </div>
+                  <label class="toggle-switch" title="Toggle SFX">
+                    <input type="checkbox" id="toggle-sfx" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-lyrics-label" class="settings-label">Mini Pill Lyrics</span>
+                  </div>
+                  <label class="toggle-switch" title="Toggle mini lyrics">
+                    <input type="checkbox" id="toggle-mini-lyrics" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-shortcut-label" class="settings-label">Hide / Show Key</span>
+                  </div>
+                  <button id="btn-shortcut-key" class="btn-setting-action btn-shortcut-pill" title="Click to change keyboard shortcut">
+                    <span id="txt-shortcut-key-display">`</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="settings-section-label" id="sec-lbl-reset">Factory Reset</div>
+              <div class="settings-group-card">
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-reset-all-label" class="settings-label">Reset Settings</span>
+                  </div>
+                  <button id="btn-reset-all-settings" class="btn-setting-action btn-danger-pill">
+                    <span id="txt-reset-all-btn">Reset</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 2: DISPLAY (Monitor, Position Reset, Open Trigger Hover/Click & Hover Delay) -->
+            <div id="settings-tab-display" class="settings-tab-pane">
+              <div class="settings-section-label" id="sec-lbl-screen">Screen & Placement</div>
+              <div class="settings-group-card">
+                <div id="settings-item-monitor" class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-monitor-label" class="settings-label">Display Monitor</span>
+                  </div>
+                  <button id="btn-switch-monitor" class="btn-setting-action">
+                    <span id="txt-current-monitor">Monitor 1 ⇄</span>
+                  </button>
+                </div>
+
+                <div id="settings-item-position" class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-position-label" class="settings-label">Position</span>
+                  </div>
+                  <button id="btn-reset-position" class="btn-setting-action">
+                    <span id="txt-reset-pos-btn">Reset</span>
+                  </button>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-floating-notch-label" class="settings-label">Floating Notch</span>
+                  </div>
+                  <label class="toggle-switch" title="Detach notch from top screen edge as a floating capsule">
+                    <input type="checkbox" id="toggle-floating-notch" />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="settings-section-label" id="sec-lbl-motion">Notch Interaction</div>
+              <div class="settings-group-card">
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-open-mode-label" class="settings-label">Open Notch</span>
+                  </div>
+                  <div class="segmented-control" id="open-mode-segmented">
+                    <button type="button" id="btn-mode-hover" class="seg-btn active" data-open-mode="hover">Hover</button>
+                    <button type="button" id="btn-mode-click" class="seg-btn" data-open-mode="click">Click</button>
+                  </div>
+                </div>
+
+                <div id="settings-item-hover-delay" class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-hover-delay-label" class="settings-label">Hover Hold Delay</span>
+                  </div>
+                  <div class="anim-speed-control">
+                    <span id="txt-hover-delay-val" class="anim-speed-val">0.25s</span>
+                    <input type="range" id="slider-hover-delay" min="0" max="800" step="50" value="250" class="theme-opacity-slider anim-slider" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 3: APPEARANCE (Preset Colors + Custom Color Picker + Single Neutral Glass Toggle) -->
+            <div id="settings-tab-appearance" class="settings-tab-pane">
+              <div class="settings-section-label" id="txt-theme-label">Appearance</div>
+              <div class="settings-group-card">
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-preset-colors-label" class="settings-label">Preset Colors</span>
+                  </div>
                   <div class="theme-swatches-grid">
-                    <button class="theme-swatch" data-theme="gray" title="Slate Gray" style="--swatch-gradient: linear-gradient(135deg, #e4e4e7, #a1a1aa, #71717a);">
+                    <button class="theme-swatch active" data-theme="blue" title="Royal Blue" style="--swatch-gradient: linear-gradient(135deg, #60a5fa, #3b82f6, #1d4ed8);">
+                      <span class="swatch-color"></span>
+                    </button>
+                    <button class="theme-swatch" data-theme="cyan" title="Neon Cyan" style="--swatch-gradient: linear-gradient(135deg, #38bdf8, #06b6d4, #0284c7);">
                       <span class="swatch-color"></span>
                     </button>
                     <button class="theme-swatch" data-theme="pink" title="Sakura Pink" style="--swatch-gradient: linear-gradient(135deg, #ff758c, #ff7eb3, #f43f5e);">
                       <span class="swatch-color"></span>
                     </button>
-                    <button class="theme-swatch active" data-theme="cyan" title="Neon Cyan" style="--swatch-gradient: linear-gradient(135deg, #0ea5e9, #06b6d4, #3b82f6);">
+                    <button class="theme-swatch" data-theme="emerald" title="Emerald Green" style="--swatch-gradient: linear-gradient(135deg, #34d399, #10b981, #059669);">
                       <span class="swatch-color"></span>
                     </button>
-                    <button class="theme-swatch" data-theme="emerald" title="Emerald Green" style="--swatch-gradient: linear-gradient(135deg, #10b981, #059669, #34d399);">
+                    <button class="theme-swatch" data-theme="sunset" title="Sunset Amber" style="--swatch-gradient: linear-gradient(135deg, #fb923c, #f97316, #ef4444);">
                       <span class="swatch-color"></span>
                     </button>
-                    <button class="theme-swatch" data-theme="sunset" title="Sunset Amber" style="--swatch-gradient: linear-gradient(135deg, #f97316, #ef4444, #f43f5e);">
+                    <button class="theme-swatch" data-theme="gold" title="Solar Gold" style="--swatch-gradient: linear-gradient(135deg, #fde047, #eab308, #ca8a04);">
                       <span class="swatch-color"></span>
                     </button>
-                    <button class="theme-swatch" data-theme="gold" title="Solar Gold" style="--swatch-gradient: linear-gradient(135deg, #f59e0b, #eab308, #fbbf24);">
+                    <button class="theme-swatch" data-theme="violet" title="Mystic Violet" style="--swatch-gradient: linear-gradient(135deg, #c084fc, #a855f7, #7e22ce);">
+                      <span class="swatch-color"></span>
+                    </button>
+                    <button class="theme-swatch" data-theme="gray" title="Slate Gray" style="--swatch-gradient: linear-gradient(135deg, #e4e4e7, #a1a1aa, #52525b);">
                       <span class="swatch-color"></span>
                     </button>
                   </div>
+                </div>
 
-                  <!-- 2. UI Theme Mode -->
-                  <div class="theme-header" style="margin-top: 6px;">
-                    <span id="txt-style-theme-label" class="settings-label">Theme</span>
-                  </div>
-                  <div class="style-theme-grid">
-                    <button class="style-theme-btn active" data-style-theme="default" title="Default Minimal Glass">
-                      <span id="txt-theme-default">Default</span>
-                    </button>
-                    <button class="style-theme-btn" data-style-theme="sakura" title="Japanese Sakura Theme">
-                      <span id="txt-theme-sakura">Sakura</span>
-                    </button>
-                    <button class="style-theme-btn" data-style-theme="mountain" title="Japanese Mountain Landscape">
-                      <span id="txt-theme-mountain">Mountain</span>
-                    </button>
-                    <button class="style-theme-btn" data-style-theme="color" title="Custom Background Color">
-                      <span id="txt-theme-color">Color</span>
-                    </button>
-                  </div>
-
-                  <!-- 2.1 Custom Theme Background Color Picker (Active when 'Color' theme chosen) -->
-                  <div id="theme-bg-color-control" class="theme-bg-color-control" style="display: none;">
+                <!-- Built-in Cross-Platform Interactive Color Picker (Works 100% on macOS & Windows) -->
+                <div class="settings-row settings-row-col">
+                  <div class="custom-picker-top">
+                    <div class="settings-texts">
+                      <span id="txt-custom-color-label" class="settings-label">Custom Color Picker</span>
+                    </div>
                     <div class="color-picker-control">
-                      <label class="color-picker-swatch-wrap" title="Klik untuk pilih warna background (Color Dialog)">
-                        <input type="color" id="input-theme-bg-color" value="#181824" class="hidden-color-input" />
-                        <span id="theme-bg-swatch-current" class="color-swatch-preview"></span>
-                        <span id="txt-theme-bg-hex-val" class="color-hex-text">#181824</span>
-                      </label>
-                      <button id="btn-theme-bg-eyedropper" class="btn-eyedropper" title="Ambil warna background dari layar (Pipette)">
+                      <div class="color-picker-swatch-wrap" id="btn-toggle-spectrum">
+                        <span id="color-swatch-current" class="color-swatch-preview"></span>
+                        <input type="text" id="input-color-hex-text" class="color-hex-input" value="#3B82F6" maxlength="7" spellcheck="false" />
+                        <input type="color" id="input-custom-color" value="#3b82f6" class="hidden-color-input" />
+                      </div>
+                      <button id="btn-eyedropper" class="btn-eyedropper" title="Pick color from screen (Windows & macOS)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                           <path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"></path>
                           <path d="m5 2 5 5"></path>
@@ -642,40 +847,113 @@
                     </div>
                   </div>
 
-                  <!-- 3. Theme Background Opacity Slider -->
-                  <div id="theme-opacity-control" class="theme-opacity-control disabled">
-                    <div class="theme-opacity-header">
-                      <span id="txt-theme-opacity-label" class="settings-desc">Opacity</span>
-                      <span id="txt-theme-opacity-val" class="theme-opacity-val">25%</span>
+                  <!-- Universal Interactive HSV Spectrum + Hue Slider -->
+                  <div id="universal-color-spectrum" class="universal-color-spectrum">
+                    <div id="sv-palette-box" class="sv-palette-box">
+                      <div class="sv-white-grad"></div>
+                      <div class="sv-black-grad"></div>
+                      <div id="sv-cursor" class="sv-cursor"></div>
                     </div>
-                    <input type="range" id="slider-theme-opacity" min="5" max="90" value="25" step="1" class="theme-opacity-slider" />
+                    <div class="hue-slider-row">
+                      <input type="range" id="slider-color-hue" min="0" max="360" value="217" step="1" class="hue-rainbow-slider" />
+                    </div>
                   </div>
+                </div>
 
-                  <div class="settings-footer-info">
-                    <span id="txt-app-footer">BaoBao v0.1.1</span>
+                <!-- Single Neutral Glass Toggle (Independent of Theme Color) -->
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-glass-mode-label" class="settings-label">Glass</span>
                   </div>
+                  <label class="toggle-switch" title="Toggle Glass Background">
+                    <input type="checkbox" id="toggle-glass-mode" />
+                    <span class="toggle-slider"></span>
+                  </label>
                 </div>
               </div>
             </div>
+
+            <!-- TAB 4: MENU BAR (Toggle Notch Menus & Laptop Battery Indicator) -->
+            <div id="settings-tab-menubar" class="settings-tab-pane">
+              <div class="settings-section-label" id="sec-lbl-menubar-tabs">Notch Menus</div>
+              <div class="settings-group-card">
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-menubar-music" class="settings-label">Music Player</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-menu-music" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-menubar-notes" class="settings-label">Quick Notes</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-menu-notes" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-menubar-focus" class="settings-label">Focus Time</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-menu-focus" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-menubar-calendar" class="settings-label">Calendar</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-menu-calendar" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="settings-section-label" id="sec-lbl-menubar-status">Status Indicators</div>
+              <div class="settings-group-card">
+                <div class="settings-row">
+                  <div class="settings-texts">
+                    <span id="txt-menubar-battery" class="settings-label">Laptop Battery</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-menu-battery" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 4: ABOUT (With Eyes Fixed, Notch Text, Author Removed) -->
+            <div id="settings-tab-about" class="settings-tab-pane">
+              <div class="settings-group-card about-card">
+                <div class="about-logo-box">
+                  <div class="about-baobao-mascot">
+                    <svg viewBox="0 0 32 30" width="42" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M16 2.4 C14.7 2.4 13.9 3.8 12.8 4.4 C11.4 5.1 9.6 5.0 8.4 6.2 C5.8 8.4 2.8 12.2 2.8 16.5 C2.8 23.2 8.6 28 16 28 C23.4 28 29.2 23.2 29.2 16.5 C29.2 12.2 26.2 8.4 23.6 6.2 C22.4 5.0 20.6 5.1 19.2 4.4 C18.1 3.8 17.3 2.4 16 2.4 Z" fill="var(--theme-accent)" />
+                      <path d="M16 5.5 V9.2 M12.6 6.6 L10.6 9.8 M19.4 6.6 L21.4 9.8" stroke="rgba(255, 255, 255, 0.55)" stroke-width="1.3" stroke-linecap="round" />
+                      <!-- Cute BaoBao Eyes inside About SVG -->
+                      <circle cx="12.2" cy="18.2" r="2.2" fill="#ffffff" />
+                      <circle cx="19.8" cy="18.2" r="2.2" fill="#ffffff" />
+                    </svg>
+                  </div>
+                </div>
+                <h4 id="txt-app-footer" class="about-title">BaoBao v0.1.1</h4>
+                <p id="txt-about-subtitle" class="about-subtitle">Smart Desktop Notch for Windows & macOS</p>
+              </div>
+            </div>
           </div>
-
-          <!-- Right Arrow -->
-          <button id="btn-next-slide" class="nav-arrow right-arrow" title="Next view">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
         </div>
 
-        <!-- Carousel Dots -->
-        <div class="carousel-dots">
-          <span class="dot active" data-index="0" title="Music"></span>
-          <span class="dot" data-index="1" title="Shelf"></span>
-          <span class="dot" data-index="2" title="Notes"></span>
-          <span class="dot" data-index="3" title="Settings"></span>
-        </div>
-
-        <!-- Reset Confirmation Modal Dialog -->
+        <!-- Reset Confirmation Modal Dialog (Inside Settings Window) -->
         <div id="modal-reset-confirm" class="confirm-modal-overlay" style="display: none;">
           <div class="confirm-modal-card">
             <div class="confirm-modal-icon">
@@ -685,13 +963,13 @@
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
             </div>
-            <h4 id="txt-modal-reset-title" class="confirm-modal-title">Reset Semua Pengaturan?</h4>
+            <h4 id="txt-modal-reset-title" class="confirm-modal-title">Reset All Settings?</h4>
             <p id="txt-modal-reset-desc" class="confirm-modal-desc">
-              Semua preferensi warna, tema, pintasan keyboard, durasi animasi, dan posisi akan dikembalikan ke setelan awal.
+              All appearance colors, keyboard shortcuts, hover settings, and positions will be restored to default.
             </p>
             <div class="confirm-modal-actions">
-              <button id="btn-cancel-reset" class="btn-modal-cancel">Batal</button>
-              <button id="btn-confirm-reset" class="btn-modal-confirm">Ya, Reset</button>
+              <button id="btn-cancel-reset" class="btn-modal-cancel">Cancel</button>
+              <button id="btn-confirm-reset" class="btn-modal-confirm">Yes, Reset</button>
             </div>
           </div>
         </div>

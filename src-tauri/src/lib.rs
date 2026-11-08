@@ -181,29 +181,713 @@ fn open_spotify() {
     }
 }
 
-/// Open any file, folder, shortcut, or app with default application
+/// Resolved metadata from a Windows .lnk shortcut file via COM IShellLinkW (0ms, no PowerShell)
+#[cfg(windows)]
+#[derive(Default, Debug, Clone)]
+struct LnkDetails {
+    target_path: String,
+    arguments: String,
+    working_dir: String,
+    icon_path: String,
+}
+
+#[cfg(windows)]
+fn resolve_lnk_details(path: &str) -> Option<LnkDetails> {
+    if !path.to_lowercase().ends_with(".lnk") {
+        return None;
+    }
+    use std::ffi::{c_void, OsStr};
+    use std::os::windows::ffi::OsStrExt;
+    use windows::core::GUID;
+    use windows::Win32::System::Com::{CoInitializeEx, COINIT_APARTMENTTHREADED, COINIT_DISABLE_OLE1DDE};
+
+    #[link(name = "ole32")]
+    unsafe extern "system" {
+        fn CoCreateInstance(
+            rclsid: *const GUID,
+            pUnkOuter: *mut c_void,
+            dwClsContext: u32,
+            riid: *const GUID,
+            ppv: *mut *mut c_void,
+        ) -> i32;
+    }
+
+    const CLSID_SHELL_LINK: GUID = GUID::from_u128(0x00021401_0000_0000_c000_000000000046);
+    const IID_ISHELL_LINK_W: GUID = GUID::from_u128(0x000214f9_0000_0000_c000_000000000046);
+    const IID_IPERSIST_FILE: GUID = GUID::from_u128(0x0000010b_0000_0000_c000_000000000046);
+    const CLSCTX_INPROC_SERVER: u32 = 1;
+
+    fn wide_buf_to_string(buf: &[u16]) -> String {
+        let len = buf.iter().position(|&c| c == 0).unwrap_or(buf.len());
+        String::from_utf16_lossy(&buf[..len]).trim().to_string()
+    }
+
+    unsafe {
+        let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+        let mut psl: *mut c_void = std::ptr::null_mut();
+        if CoCreateInstance(
+            &CLSID_SHELL_LINK,
+            std::ptr::null_mut(),
+            CLSCTX_INPROC_SERVER,
+            &IID_ISHELL_LINK_W,
+            &mut psl,
+        ) < 0
+            || psl.is_null()
+        {
+            return None;
+        }
+
+        let psl_vtbl = *(psl as *mut *const usize);
+        let query_interface: unsafe extern "system" fn(*mut c_void, *const GUID, *mut *mut c_void) -> i32 =
+            std::mem::transmute(*psl_vtbl.add(0));
+        let release_psl: unsafe extern "system" fn(*mut c_void) -> u32 =
+            std::mem::transmute(*psl_vtbl.add(2));
+
+        let mut ppf: *mut c_void = std::ptr::null_mut();
+        if query_interface(psl, &IID_IPERSIST_FILE, &mut ppf) < 0 || ppf.is_null() {
+            release_psl(psl);
+            return None;
+        }
+
+        let ppf_vtbl = *(ppf as *mut *const usize);
+        let release_ppf: unsafe extern "system" fn(*mut c_void) -> u32 =
+            std::mem::transmute(*ppf_vtbl.add(2));
+        let load_file: unsafe extern "system" fn(*mut c_void, *const u16, u32) -> i32 =
+            std::mem::transmute(*ppf_vtbl.add(5));
+
+        let mut wide_path: Vec<u16> = OsStr::new(path).encode_wide().collect();
+        wide_path.push(0);
+
+        let hr = load_file(ppf, wide_path.as_ptr(), 0);
+        release_ppf(ppf);
+
+        if hr < 0 {
+            release_psl(psl);
+            return None;
+        }
+
+        let get_path: unsafe extern "system" fn(*mut c_void, *mut u16, i32, *mut c_void, u32) -> i32 =
+            std::mem::transmute(*psl_vtbl.add(3));
+        let get_working_dir: unsafe extern "system" fn(*mut c_void, *mut u16, i32) -> i32 =
+            std::mem::transmute(*psl_vtbl.add(8));
+        let get_arguments: unsafe extern "system" fn(*mut c_void, *mut u16, i32) -> i32 =
+            std::mem::transmute(*psl_vtbl.add(10));
+        let get_icon_loc: unsafe extern "system" fn(*mut c_void, *mut u16, i32, *mut i32) -> i32 =
+            std::mem::transmute(*psl_vtbl.add(16));
+
+        let mut target_buf = [0u16; 1024];
+        let mut workdir_buf = [0u16; 1024];
+        let mut args_buf = [0u16; 1024];
+        let mut icon_buf = [0u16; 1024];
+        let mut icon_idx: i32 = 0;
+
+        let _ = get_path(psl, target_buf.as_mut_ptr(), 1024, std::ptr::null_mut(), 0);
+        let _ = get_working_dir(psl, workdir_buf.as_mut_ptr(), 1024);
+        let _ = get_arguments(psl, args_buf.as_mut_ptr(), 1024);
+        let _ = get_icon_loc(psl, icon_buf.as_mut_ptr(), 1024, &mut icon_idx);
+
+        release_psl(psl);
+
+        Some(LnkDetails {
+            target_path: wide_buf_to_string(&target_buf),
+            arguments: wide_buf_to_string(&args_buf),
+            working_dir: wide_buf_to_string(&workdir_buf),
+            icon_path: wide_buf_to_string(&icon_buf),
+        })
+    }
+}
+
+/// Helper for Squirrel apps (like Discord/Slack) where Update.exe is stored in parent dir
+#[cfg(windows)]
+fn find_squirrel_app_exe(update_exe_path: &str) -> Option<(String, String)> {
+    let p = std::path::Path::new(update_exe_path);
+    let file_name = p.file_name()?.to_string_lossy().to_lowercase();
+    if file_name != "update.exe" {
+        return None;
+    }
+    let parent = p.parent()?;
+    let app_folder_name = parent.file_name()?.to_string_lossy().to_string();
+    let expected_exe = format!("{}.exe", app_folder_name);
+
+    if let Ok(entries) = std::fs::read_dir(parent) {
+        let mut best_exe: Option<String> = None;
+        for entry in entries.flatten() {
+            let ep = entry.path();
+            if ep.is_dir() {
+                if let Some(dn) = ep.file_name().map(|s| s.to_string_lossy().to_string()) {
+                    if dn.starts_with("app-") {
+                        let candidate = ep.join(&expected_exe);
+                        if candidate.exists() {
+                            best_exe = Some(candidate.to_string_lossy().to_string());
+                        }
+                    }
+                }
+            }
+        }
+        if let Some(exe_full) = best_exe {
+            return Some((app_folder_name, exe_full));
+        }
+    }
+    Some((app_folder_name, String::new()))
+}
+
+/// Open any file, folder, shortcut, or app with default application (non-blocking)
 #[tauri::command]
-fn open_file_path(path: String) -> Result<(), String> {
+async fn open_file_path(path: String) -> Result<(), String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        #[cfg(windows)]
+        {
+            use std::ffi::OsStr;
+            use std::os::windows::ffi::OsStrExt;
+            use std::path::Path;
+            use windows::Win32::System::Com::{CoInitializeEx, COINIT_APARTMENTTHREADED, COINIT_DISABLE_OLE1DDE};
+
+            unsafe extern "system" {
+                fn ShellExecuteW(
+                    hwnd: isize,
+                    lpOperation: *const u16,
+                    lpFile: *const u16,
+                    lpParameters: *const u16,
+                    lpDirectory: *const u16,
+                    nShowCmd: i32,
+                ) -> isize;
+            }
+
+            fn to_wide(s: &str) -> Vec<u16> {
+                let mut v: Vec<u16> = OsStr::new(s).encode_wide().collect();
+                v.push(0);
+                v
+            }
+
+            unsafe {
+                let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+            }
+
+            let clean_path = path.trim_matches('"').to_string();
+            let mut target_file = clean_path.clone();
+            let mut target_args = String::new();
+            let mut target_dir = Path::new(&clean_path)
+                .parent()
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_default();
+
+            if clean_path.to_lowercase().ends_with(".lnk") {
+                if let Some(details) = resolve_lnk_details(&clean_path) {
+                    if !details.target_path.is_empty() && Path::new(&details.target_path).exists() {
+                        target_file = details.target_path.clone();
+                        target_args = details.arguments;
+                        if !details.working_dir.is_empty() && Path::new(&details.working_dir).is_dir() {
+                            target_dir = details.working_dir;
+                        } else {
+                            target_dir = Path::new(&target_file)
+                                .parent()
+                                .map(|p| p.to_string_lossy().to_string())
+                                .unwrap_or_default();
+                        }
+                    }
+                }
+            } else if let Some((app_name, _)) = find_squirrel_app_exe(&clean_path) {
+                // If the saved path is a Squirrel Update.exe (e.g. Discord\Update.exe), pass --processStart
+                target_args = format!("--processStart {}.exe", app_name);
+            }
+
+            let wide_file = to_wide(&target_file);
+            let wide_args = to_wide(&target_args);
+            let wide_dir = to_wide(&target_dir);
+            let wide_open = to_wide("open");
+            const SW_SHOWNORMAL: i32 = 1;
+
+            let res = unsafe {
+                let r1 = ShellExecuteW(
+                    0,
+                    std::ptr::null(),
+                    wide_file.as_ptr(),
+                    if target_args.is_empty() { std::ptr::null() } else { wide_args.as_ptr() },
+                    if target_dir.is_empty() { std::ptr::null() } else { wide_dir.as_ptr() },
+                    SW_SHOWNORMAL,
+                );
+                if r1 <= 32 {
+                    ShellExecuteW(
+                        0,
+                        wide_open.as_ptr(),
+                        wide_file.as_ptr(),
+                        if target_args.is_empty() { std::ptr::null() } else { wide_args.as_ptr() },
+                        if target_dir.is_empty() { std::ptr::null() } else { wide_dir.as_ptr() },
+                        SW_SHOWNORMAL,
+                    )
+                } else {
+                    r1
+                }
+            };
+
+            if res <= 32 {
+                use std::process::Command;
+                let _ = Command::new("explorer")
+                    .arg(&clean_path)
+                    .spawn()
+                    .map_err(|e| e.to_string())?;
+            }
+        }
+        #[cfg(target_os = "macos")]
+        {
+            let _ = std::process::Command::new("open").arg(&path).spawn();
+        }
+        #[cfg(all(not(windows), not(target_os = "macos")))]
+        {
+            let _ = std::process::Command::new("xdg-open").arg(&path).spawn();
+        }
+        Ok(())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[derive(Clone, Serialize, Debug, Default)]
+pub struct FileInfoPayload {
+    pub path: String,
+    pub name: String,
+    pub size_bytes: u64,
+    pub is_dir: bool,
+    pub ext: String,
+    pub icon: Option<String>,
+}
+
+#[tauri::command]
+async fn get_file_info(path: String) -> FileInfoPayload {
+    tauri::async_runtime::spawn_blocking(move || {
+        let clean = path.trim_matches('"').to_string();
+        let p = std::path::Path::new(&clean);
+        let mut raw_name = p
+            .file_name()
+            .map(|s| s.to_string_lossy().to_string())
+            .unwrap_or_else(|| clean.clone());
+
+        let mut is_dir = false;
+        let mut size_bytes = 0u64;
+        let mut inspect_path = clean.clone();
+        let mut custom_icon_source: Option<String> = None;
+        let is_lnk = clean.to_lowercase().ends_with(".lnk");
+
+        #[cfg(windows)]
+        {
+            if is_lnk {
+                if let Some(details) = resolve_lnk_details(&clean) {
+                    if !details.target_path.is_empty() && std::path::Path::new(&details.target_path).exists() {
+                        inspect_path = details.target_path.clone();
+                        if let Some((_, real_exe)) = find_squirrel_app_exe(&inspect_path) {
+                            if !real_exe.is_empty() {
+                                custom_icon_source = Some(real_exe);
+                            }
+                        }
+                    }
+                    if custom_icon_source.is_none()
+                        && !details.icon_path.is_empty()
+                        && std::path::Path::new(&details.icon_path).exists()
+                    {
+                        custom_icon_source = Some(details.icon_path);
+                    }
+                }
+            } else if let Some((app_name, real_exe)) = find_squirrel_app_exe(&clean) {
+                raw_name = app_name;
+                if !real_exe.is_empty() {
+                    custom_icon_source = Some(real_exe);
+                }
+            }
+        }
+
+        let eff_p = std::path::Path::new(&inspect_path);
+        if let Ok(meta) = std::fs::metadata(eff_p).or_else(|_| std::fs::metadata(p)) {
+            is_dir = meta.is_dir();
+            size_bytes = meta.len();
+        }
+
+        let ext = if is_dir {
+            "FOLDER".to_string()
+        } else if is_lnk && inspect_path == clean {
+            // UWP / Shell shortcut without a direct disk target path
+            "APP".to_string()
+        } else {
+            eff_p
+                .extension()
+                .or_else(|| p.extension())
+                .map(|e| e.to_string_lossy().to_uppercase())
+                .unwrap_or_else(|| "FILE".to_string())
+        };
+
+        #[cfg(windows)]
+        let icon = custom_icon_source
+            .as_deref()
+            .and_then(icon_extractor::get_file_icon_base64)
+            .or_else(|| {
+                if inspect_path != clean {
+                    icon_extractor::get_file_icon_base64(&inspect_path)
+                } else {
+                    None
+                }
+            })
+            .or_else(|| icon_extractor::get_file_icon_base64(&clean));
+        #[cfg(not(windows))]
+        let icon = None;
+
+        // Keep `clean` so .lnk files preserve their launch arguments & working directory
+        FileInfoPayload {
+            path: clean,
+            name: raw_name,
+            size_bytes,
+            is_dir,
+            ext,
+            icon,
+        }
+    })
+    .await
+    .unwrap_or_default()
+}
+
+/// Native file picker dialog for the '+' button in File Tray (non-blocking, instant Win32 GetOpenFileNameW)
+#[tauri::command]
+async fn pick_files_dialog(window: tauri::WebviewWindow) -> Vec<String> {
+    IS_MODAL_OPEN.store(true, Ordering::SeqCst);
+    let _ = window.set_ignore_cursor_events(true);
     #[cfg(windows)]
-    {
-        use std::os::windows::process::CommandExt;
-        use std::process::Command;
-        const CREATE_NO_WINDOW: u32 = 0x08000000;
-        let _ = Command::new("cmd")
-            .args(&["/C", "start", "", &path])
-            .creation_flags(CREATE_NO_WINDOW)
-            .spawn()
-            .map_err(|e| e.to_string())?;
-    }
-    #[cfg(target_os = "macos")]
-    {
-        let _ = std::process::Command::new("open").arg(&path).spawn();
-    }
-    #[cfg(all(not(windows), not(target_os = "macos")))]
-    {
-        let _ = std::process::Command::new("xdg-open").arg(&path).spawn();
-    }
-    Ok(())
+    let hwnd_val = window.hwnd().ok().map(|h| h.0 as isize).unwrap_or(0);
+    #[cfg(windows)]
+    set_hwnd_modal_passthrough(hwnd_val, true);
+
+    let result = tauri::async_runtime::spawn_blocking(move || {
+        #[cfg(windows)]
+        {
+            use std::ffi::{c_void, OsStr};
+            use std::os::windows::ffi::OsStrExt;
+            use windows::Win32::System::Com::{CoInitializeEx, COINIT_APARTMENTTHREADED, COINIT_DISABLE_OLE1DDE};
+
+            #[repr(C)]
+            struct OPENFILENAMEW {
+                l_struct_size: u32,
+                hwnd_owner: isize,
+                h_instance: isize,
+                lpstr_filter: *const u16,
+                lpstr_custom_filter: *mut u16,
+                n_max_cust_filter: u32,
+                n_filter_index: u32,
+                lpstr_file: *mut u16,
+                n_max_file: u32,
+                lpstr_file_title: *mut u16,
+                n_max_file_title: u32,
+                lpstr_initial_dir: *const u16,
+                lpstr_title: *const u16,
+                flags: u32,
+                n_file_offset: u16,
+                n_file_extension: u16,
+                lpstr_def_ext: *const u16,
+                l_cust_data: isize,
+                lpfn_hook: isize,
+                lp_template_name: *const u16,
+                pv_reserved: *mut c_void,
+                dw_reserved: u32,
+                flags_ex: u32,
+            }
+
+            #[link(name = "comdlg32")]
+            unsafe extern "system" {
+                fn GetOpenFileNameW(lpofn: *mut OPENFILENAMEW) -> i32;
+            }
+
+            unsafe extern "system" {
+                fn CreateWindowExW(
+                    dwExStyle: u32,
+                    lpClassName: *const u16,
+                    lpWindowName: *const u16,
+                    dwStyle: u32,
+                    x: i32,
+                    y: i32,
+                    nWidth: i32,
+                    nHeight: i32,
+                    hWndParent: isize,
+                    hMenu: isize,
+                    hInstance: isize,
+                    lpParam: *mut c_void,
+                ) -> isize;
+                fn DestroyWindow(hWnd: isize) -> i32;
+                fn SetForegroundWindow(hWnd: isize) -> i32;
+                fn GetSystemMetrics(nIndex: i32) -> i32;
+            }
+
+            unsafe {
+                let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+                let screen_w = GetSystemMetrics(0);
+                let screen_h = GetSystemMetrics(1);
+                let cls: Vec<u16> = OsStr::new("STATIC\0").encode_wide().collect();
+                // Create a tiny invisible TopMost owner on THIS thread so the dialog opens in front and centered
+                let owner_hwnd = CreateWindowExW(
+                    0x00000008 | 0x00000080, // WS_EX_TOPMOST | WS_EX_TOOLWINDOW
+                    cls.as_ptr(),
+                    cls.as_ptr(),
+                    0x80000000, // WS_POPUP
+                    (screen_w / 2 - 360).max(40),
+                    (screen_h / 2 - 240).max(80),
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    std::ptr::null_mut(),
+                );
+                if owner_hwnd != 0 {
+                    let _ = SetForegroundWindow(owner_hwnd);
+                }
+
+                let filter: Vec<u16> = OsStr::new("All Files (*.*)\0*.*\0\0").encode_wide().collect();
+                let title: Vec<u16> = OsStr::new("Select files or apps to add to BaoBao Tray\0")
+                    .encode_wide()
+                    .collect();
+                let mut file_buf = vec![0u16; 32768];
+
+                const OFN_NOCHANGEDIR: u32 = 0x00000008;
+                const OFN_ALLOWMULTISELECT: u32 = 0x00000200;
+                const OFN_PATHMUSTEXIST: u32 = 0x00000800;
+                const OFN_FILEMUSTEXIST: u32 = 0x00001000;
+                const OFN_EXPLORER: u32 = 0x00080000;
+                const OFN_NODEREFERENCELINKS: u32 = 0x00100000;
+
+                let mut ofn: OPENFILENAMEW = std::mem::zeroed();
+                ofn.l_struct_size = std::mem::size_of::<OPENFILENAMEW>() as u32;
+                ofn.hwnd_owner = owner_hwnd;
+                ofn.lpstr_filter = filter.as_ptr();
+                ofn.n_filter_index = 1;
+                ofn.lpstr_file = file_buf.as_mut_ptr();
+                ofn.n_max_file = file_buf.len() as u32;
+                ofn.lpstr_title = title.as_ptr();
+                ofn.flags = OFN_EXPLORER
+                    | OFN_ALLOWMULTISELECT
+                    | OFN_FILEMUSTEXIST
+                    | OFN_PATHMUSTEXIST
+                    | OFN_NOCHANGEDIR
+                    | OFN_NODEREFERENCELINKS;
+
+                let ok = GetOpenFileNameW(&mut ofn);
+                if owner_hwnd != 0 {
+                    let _ = DestroyWindow(owner_hwnd);
+                }
+
+                if ok == 0 {
+                    return Vec::new();
+                }
+
+                let mut parts: Vec<String> = Vec::new();
+                let mut start = 0usize;
+                while start < file_buf.len() {
+                    let mut end = start;
+                    while end < file_buf.len() && file_buf[end] != 0 {
+                        end += 1;
+                    }
+                    if end == start {
+                        break;
+                    }
+                    parts.push(String::from_utf16_lossy(&file_buf[start..end]));
+                    start = end + 1;
+                }
+
+                if parts.len() == 1 {
+                    return vec![parts.remove(0)];
+                } else if parts.len() > 1 {
+                    let dir = std::path::PathBuf::from(&parts[0]);
+                    return parts[1..]
+                        .iter()
+                        .map(|name| dir.join(name).to_string_lossy().to_string())
+                        .collect();
+                }
+                Vec::new()
+            }
+        }
+        #[cfg(target_os = "macos")]
+        {
+            use std::process::Command;
+            let script = r#"
+                set chosenFiles to choose file with prompt "Select files to add to BaoBao Tray" with multiple selections allowed
+                set pathList to ""
+                repeat with aFile in chosenFiles
+                    set pathList to pathList & (POSIX path of aFile) & linefeed
+                end repeat
+                return pathList
+            "#;
+            if let Ok(out) = Command::new("osascript").args(["-e", script]).output() {
+                let text = String::from_utf8_lossy(&out.stdout);
+                return text
+                    .lines()
+                    .map(|l| l.trim().to_string())
+                    .filter(|l| !l.is_empty())
+                    .collect();
+            }
+            Vec::new()
+        }
+        #[cfg(not(any(windows, target_os = "macos")))]
+        {
+            Vec::new()
+        }
+    })
+    .await
+    .unwrap_or_default();
+
+    IS_MODAL_OPEN.store(false, Ordering::SeqCst);
+    #[cfg(windows)]
+    set_hwnd_modal_passthrough(hwnd_val, false);
+    result
+}
+
+/// Cross-platform native color picker fallback (non-blocking, instant Win32 ChooseColorW / macOS choose color)
+#[tauri::command]
+async fn pick_native_color(window: tauri::WebviewWindow, initial_hex: Option<String>) -> Option<String> {
+    IS_MODAL_OPEN.store(true, Ordering::SeqCst);
+    let _ = window.set_ignore_cursor_events(true);
+    #[cfg(windows)]
+    let hwnd_val = window.hwnd().ok().map(|h| h.0 as isize).unwrap_or(0);
+    #[cfg(windows)]
+    set_hwnd_modal_passthrough(hwnd_val, true);
+
+    let result = tauri::async_runtime::spawn_blocking(move || {
+        #[cfg(target_os = "macos")]
+        {
+            use std::process::Command;
+            let hex = initial_hex.unwrap_or_else(|| "#3b82f6".to_string());
+            let clean = hex.trim_start_matches('#');
+            let (r, g, b) = if clean.len() == 6 {
+                let r = u16::from_str_radix(&clean[0..2], 16).unwrap_or(59) * 257;
+                let g = u16::from_str_radix(&clean[2..4], 16).unwrap_or(130) * 257;
+                let b = u16::from_str_radix(&clean[4..6], 16).unwrap_or(246) * 257;
+                (r, g, b)
+            } else {
+                (15163, 33410, 63222)
+            };
+            let script = format!(
+                "set c to choose color default color {{{}, {}, {}}}\nreturn (item 1 of c) & \",\" & (item 2 of c) & \",\" & (item 3 of c)",
+                r, g, b
+            );
+            if let Ok(out) = Command::new("osascript").args(["-e", &script]).output() {
+                if out.status.success() {
+                    let s = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                    let parts: Vec<&str> = s.split(',').collect();
+                    if parts.len() == 3 {
+                        let r8 = (parts[0].trim().parse::<u32>().unwrap_or(0) / 257).min(255);
+                        let g8 = (parts[1].trim().parse::<u32>().unwrap_or(0) / 257).min(255);
+                        let b8 = (parts[2].trim().parse::<u32>().unwrap_or(0) / 257).min(255);
+                        return Some(format!("#{:02x}{:02x}{:02x}", r8, g8, b8));
+                    }
+                }
+            }
+            None
+        }
+        #[cfg(windows)]
+        {
+            use std::ffi::{c_void, OsStr};
+            use std::os::windows::ffi::OsStrExt;
+
+            #[repr(C)]
+            struct CHOOSECOLORW {
+                l_struct_size: u32,
+                hwnd_owner: isize,
+                h_instance: isize,
+                rgb_result: u32,
+                lp_cust_colors: *mut u32,
+                flags: u32,
+                l_cust_data: isize,
+                lpfn_hook: isize,
+                lp_template_name: *const u16,
+            }
+
+            #[link(name = "comdlg32")]
+            unsafe extern "system" {
+                fn ChooseColorW(lpcc: *mut CHOOSECOLORW) -> i32;
+            }
+
+            unsafe extern "system" {
+                fn CreateWindowExW(
+                    dwExStyle: u32,
+                    lpClassName: *const u16,
+                    lpWindowName: *const u16,
+                    dwStyle: u32,
+                    x: i32,
+                    y: i32,
+                    nWidth: i32,
+                    nHeight: i32,
+                    hWndParent: isize,
+                    hMenu: isize,
+                    hInstance: isize,
+                    lpParam: *mut c_void,
+                ) -> isize;
+                fn DestroyWindow(hWnd: isize) -> i32;
+                fn SetForegroundWindow(hWnd: isize) -> i32;
+                fn GetSystemMetrics(nIndex: i32) -> i32;
+            }
+
+            let hex = initial_hex.unwrap_or_else(|| "#3b82f6".to_string());
+            let clean = hex.trim_start_matches('#');
+            let (r, g, b) = if clean.len() == 6 {
+                let r = u32::from_str_radix(&clean[0..2], 16).unwrap_or(59);
+                let g = u32::from_str_radix(&clean[2..4], 16).unwrap_or(130);
+                let b = u32::from_str_radix(&clean[4..6], 16).unwrap_or(246);
+                (r, g, b)
+            } else {
+                (59, 130, 246)
+            };
+
+            unsafe {
+                let screen_w = GetSystemMetrics(0);
+                let screen_h = GetSystemMetrics(1);
+                let cls: Vec<u16> = OsStr::new("STATIC\0").encode_wide().collect();
+                let owner_hwnd = CreateWindowExW(
+                    0x00000008 | 0x00000080,
+                    cls.as_ptr(),
+                    cls.as_ptr(),
+                    0x80000000,
+                    (screen_w / 2 - 220).max(40),
+                    (screen_h / 2 - 200).max(80),
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    std::ptr::null_mut(),
+                );
+                if owner_hwnd != 0 {
+                    let _ = SetForegroundWindow(owner_hwnd);
+                }
+
+                let mut cust_colors = [0x00FFFFFFu32; 16];
+                let mut cc: CHOOSECOLORW = std::mem::zeroed();
+                cc.l_struct_size = std::mem::size_of::<CHOOSECOLORW>() as u32;
+                cc.hwnd_owner = owner_hwnd;
+                cc.rgb_result = r | (g << 8) | (b << 16);
+                cc.lp_cust_colors = cust_colors.as_mut_ptr();
+                cc.flags = 0x00000001 | 0x00000002 | 0x00000100; // CC_RGBINIT | CC_FULLOPEN | CC_ANYCOLOR
+
+                let ok = ChooseColorW(&mut cc);
+                if owner_hwnd != 0 {
+                    let _ = DestroyWindow(owner_hwnd);
+                }
+                if ok != 0 {
+                    let cr = cc.rgb_result & 0xFF;
+                    let cg = (cc.rgb_result >> 8) & 0xFF;
+                    let cb = (cc.rgb_result >> 16) & 0xFF;
+                    return Some(format!("#{:02x}{:02x}{:02x}", cr, cg, cb));
+                }
+                None
+            }
+        }
+        #[cfg(not(any(windows, target_os = "macos")))]
+        {
+            let _ = initial_hex;
+            None
+        }
+    })
+    .await
+    .unwrap_or(None);
+
+    IS_MODAL_OPEN.store(false, Ordering::SeqCst);
+    #[cfg(windows)]
+    set_hwnd_modal_passthrough(hwnd_val, false);
+    result
 }
 
 #[cfg(windows)]
@@ -282,6 +966,9 @@ mod icon_extractor {
 
     pub fn get_file_icon_base64(path: &str) -> Option<String> {
         unsafe {
+            use windows::Win32::System::Com::{CoInitializeEx, COINIT_APARTMENTTHREADED, COINIT_DISABLE_OLE1DDE};
+            let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
             let mut wide_path: Vec<u16> = OsStr::new(path).encode_wide().collect();
             wide_path.push(0);
 
@@ -400,21 +1087,26 @@ mod icon_extractor {
 
 /// Extract actual Windows icon of any file, folder, shortcut, or app and return as base64 BMP data URL
 #[tauri::command]
-fn get_file_icon(path: String) -> Option<String> {
-    #[cfg(windows)]
-    {
-        icon_extractor::get_file_icon_base64(&path)
-    }
-    #[cfg(not(windows))]
-    {
-        let _ = path;
-        None
-    }
+async fn get_file_icon(path: String) -> Option<String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        #[cfg(windows)]
+        {
+            icon_extractor::get_file_icon_base64(&path)
+        }
+        #[cfg(not(windows))]
+        {
+            let _ = path;
+            None
+        }
+    })
+    .await
+    .unwrap_or(None)
 }
 
 /// Configure Windows autostart on boot via Registry Run key
 #[tauri::command]
 fn set_autostart(enable: bool) -> Result<(), String> {
+    AUTOSTART_ENABLED.store(enable, Ordering::Relaxed);
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
@@ -552,64 +1244,134 @@ fn set_autostart(enable: bool) -> Result<(), String> {
 
 #[tauri::command]
 fn get_autostart() -> bool {
-    #[cfg(windows)]
+    #[cfg(debug_assertions)]
     {
-        use std::os::windows::process::CommandExt;
-        use std::process::Command;
-        const CREATE_NO_WINDOW: u32 = 0x08000000;
-        let output = Command::new("reg")
-            .args(&[
-                "query",
-                "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-                "/v",
-                "BaoBao",
-            ])
-            .creation_flags(CREATE_NO_WINDOW)
-            .output();
-        if let Ok(out) = output {
-            if out.status.success() {
-                return true;
+        return AUTOSTART_ENABLED.load(Ordering::Relaxed);
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        #[cfg(windows)]
+        {
+            use std::os::windows::process::CommandExt;
+            use std::process::Command;
+            const CREATE_NO_WINDOW: u32 = 0x08000000;
+            let output = Command::new("reg")
+                .args(&[
+                    "query",
+                    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                    "/v",
+                    "BaoBao",
+                ])
+                .creation_flags(CREATE_NO_WINDOW)
+                .output();
+            if let Ok(out) = output {
+                if out.status.success() {
+                    return true;
+                }
+            }
+            let legacy_output = Command::new("reg")
+                .args(&[
+                    "query",
+                    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                    "/v",
+                    "Baobao",
+                ])
+                .creation_flags(CREATE_NO_WINDOW)
+                .output();
+            if let Ok(out) = legacy_output {
+                return out.status.success();
             }
         }
-        let legacy_output = Command::new("reg")
-            .args(&[
-                "query",
-                "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-                "/v",
-                "Baobao",
-            ])
-            .creation_flags(CREATE_NO_WINDOW)
-            .output();
-        if let Ok(out) = legacy_output {
-            return out.status.success();
-        }
-    }
-    #[cfg(target_os = "macos")]
-    {
-        use std::process::Command;
-        let script = r#"tell application "System Events" to (exists login item "BaoBao") as string"#;
-        if let Ok(out) = Command::new("osascript").args(["-e", script]).output() {
-            let res = String::from_utf8_lossy(&out.stdout).trim().to_lowercase();
-            if res == "true" {
-                return true;
+        #[cfg(target_os = "macos")]
+        {
+            use std::process::Command;
+            let script = r#"tell application "System Events" to (exists login item "BaoBao") as string"#;
+            if let Ok(out) = Command::new("osascript").args(["-e", script]).output() {
+                let res = String::from_utf8_lossy(&out.stdout).trim().to_lowercase();
+                if res == "true" {
+                    return true;
+                }
             }
         }
+        AUTOSTART_ENABLED.load(Ordering::Relaxed)
     }
-    false
 }
 
 
 
 use std::sync::atomic::{AtomicBool, AtomicI32, AtomicU32, AtomicU64, Ordering};
 
+static AUTOSTART_ENABLED: AtomicBool = AtomicBool::new(true);
 static IS_EXPANDED: AtomicBool = AtomicBool::new(false);
 static WITH_LYRICS: AtomicBool = AtomicBool::new(false);
 static WITH_MINI_LYRICS: AtomicBool = AtomicBool::new(false);
+static IS_SETTINGS_OPEN: AtomicBool = AtomicBool::new(false);
+static IS_MODAL_OPEN: AtomicBool = AtomicBool::new(false);
 static MINI_WIDTH: AtomicU32 = AtomicU32::new(330);
 static ISLAND_OFFSET_X: AtomicI32 = AtomicI32::new(0);
+static SETTINGS_OFFSET_X: AtomicI32 = AtomicI32::new(0);
+static SETTINGS_OFFSET_Y: AtomicI32 = AtomicI32::new(0);
 static GLOBAL_HOTKEY_VK: AtomicU32 = AtomicU32::new(0xC0); // VK_OEM_3 (` ~)
 static IS_HOTKEY_DOWN: AtomicBool = AtomicBool::new(false);
 static LAST_TOGGLE_MS: AtomicU64 = AtomicU64::new(0);
+
+/// Directly toggle click-through (WS_EX_TRANSPARENT) and Z-order (NOTOPMOST/TOPMOST) on Windows
+/// so modal dialogs (file picker / color picker) are never covered or blocked by the overlay window.
+#[cfg(windows)]
+fn set_hwnd_modal_passthrough(hwnd_val: isize, modal_open: bool) {
+    if hwnd_val == 0 {
+        return;
+    }
+    unsafe extern "system" {
+        fn GetWindowLongW(hWnd: isize, nIndex: i32) -> i32;
+        fn SetWindowLongW(hWnd: isize, nIndex: i32, dwNewLong: i32) -> i32;
+        fn SetWindowPos(
+            hwnd: *mut std::ffi::c_void,
+            hwnd_insert_after: *mut std::ffi::c_void,
+            x: i32,
+            y: i32,
+            cx: i32,
+            cy: i32,
+            flags: u32,
+        ) -> i32;
+    }
+    const GWL_EXSTYLE: i32 = -20;
+    const WS_EX_TRANSPARENT: i32 = 0x00000020;
+    const WS_EX_LAYERED: i32 = 0x00080000;
+    const SWP_NOSIZE: u32 = 0x0001;
+    const SWP_NOMOVE: u32 = 0x0002;
+    const SWP_NOACTIVATE: u32 = 0x0010;
+
+    let raw_ptr = hwnd_val as *mut std::ffi::c_void;
+    let hwnd_topmost = (-1isize) as *mut std::ffi::c_void;
+    let hwnd_notopmost = (-2isize) as *mut std::ffi::c_void;
+
+    unsafe {
+        let ex_style = GetWindowLongW(hwnd_val, GWL_EXSTYLE);
+        if modal_open {
+            SetWindowLongW(hwnd_val, GWL_EXSTYLE, ex_style | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+            SetWindowPos(
+                raw_ptr,
+                hwnd_notopmost,
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+            );
+        } else {
+            SetWindowPos(
+                raw_ptr,
+                hwnd_topmost,
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+            );
+        }
+    }
+}
 
 fn perform_toggle(window: &tauri::WebviewWindow) {
     let now = now_ms() as u64;
@@ -647,15 +1409,27 @@ fn update_island_state(
     with_mini_lyrics: bool,
     mini_width: Option<f64>,
     offset_x: Option<f64>,
+    settings_open: Option<bool>,
+    settings_offset_x: Option<f64>,
+    settings_offset_y: Option<f64>,
 ) {
     IS_EXPANDED.store(expanded, Ordering::Relaxed);
     WITH_LYRICS.store(with_lyrics, Ordering::Relaxed);
     WITH_MINI_LYRICS.store(with_mini_lyrics, Ordering::Relaxed);
+    if let Some(s_open) = settings_open {
+        IS_SETTINGS_OPEN.store(s_open, Ordering::Relaxed);
+    }
     if let Some(w) = mini_width {
         MINI_WIDTH.store(w.round() as u32, Ordering::Relaxed);
     }
     if let Some(off) = offset_x {
         ISLAND_OFFSET_X.store(off.round() as i32, Ordering::Relaxed);
+    }
+    if let Some(sx) = settings_offset_x {
+        SETTINGS_OFFSET_X.store(sx.round() as i32, Ordering::Relaxed);
+    }
+    if let Some(sy) = settings_offset_y {
+        SETTINGS_OFFSET_Y.store(sy.round() as i32, Ordering::Relaxed);
     }
 }
 
@@ -723,6 +1497,73 @@ fn set_volume(volume: f32) -> Result<(), String> {
     }
     #[cfg(not(any(windows, target_os = "macos")))]
     Ok(())
+}
+
+#[derive(Clone, Serialize, Debug)]
+pub struct BatteryPayload {
+    pub percentage: u8,
+    pub is_charging: bool,
+    pub has_battery: bool,
+}
+
+#[tauri::command]
+fn get_battery_status() -> BatteryPayload {
+    #[cfg(windows)]
+    {
+        #[repr(C)]
+        struct SYSTEM_POWER_STATUS {
+            ac_line_status: u8,
+            battery_flag: u8,
+            battery_life_percent: u8,
+            system_status_flag: u8,
+            battery_life_time: u32,
+            battery_full_life_time: u32,
+        }
+        unsafe extern "system" {
+            fn GetSystemPowerStatus(lpSystemPowerStatus: *mut SYSTEM_POWER_STATUS) -> i32;
+        }
+        unsafe {
+            let mut status: SYSTEM_POWER_STATUS = std::mem::zeroed();
+            if GetSystemPowerStatus(&mut status) != 0 {
+                let no_battery = (status.battery_flag & 128) != 0 || status.battery_life_percent > 100;
+                let pct = if status.battery_life_percent <= 100 {
+                    status.battery_life_percent
+                } else {
+                    100
+                };
+                let charging = status.ac_line_status == 1 || (status.battery_flag & 8) != 0;
+                return BatteryPayload {
+                    percentage: pct,
+                    is_charging: charging,
+                    has_battery: !no_battery,
+                };
+            }
+        }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        use std::process::Command;
+        if let Ok(out) = Command::new("pmset").args(["-g", "batt"]).output() {
+            let text = String::from_utf8_lossy(&out.stdout);
+            let is_charging = text.contains("AC Power") || (text.contains("charging") && !text.contains("discharging"));
+            for part in text.split_whitespace() {
+                if let Some(num_str) = part.strip_suffix("%;") .or_else(|| part.strip_suffix('%')) {
+                    if let Ok(pct) = num_str.parse::<u8>() {
+                        return BatteryPayload {
+                            percentage: pct.min(100),
+                            is_charging,
+                            has_battery: true,
+                        };
+                    }
+                }
+            }
+        }
+    }
+    BatteryPayload {
+        percentage: 100,
+        is_charging: false,
+        has_battery: true,
+    }
 }
 
 /// Resize the Tauri window to the given logical width/height,
@@ -807,15 +1648,15 @@ fn position_top_center(window: &tauri::WebviewWindow) -> Result<(), String> {
 
     let monitor_size = monitor.size();
     let monitor_position = monitor.position();
-    let scale = window.scale_factor().unwrap_or(1.0);
 
     let full_w_phys = monitor_size.width;
-    let h_phys = (260.0 * scale).round() as u32;
+    let h_phys = monitor_size.height.saturating_sub(2);
 
     let _ = window.set_size(PhysicalSize::new(full_w_phys, h_phys));
 
     let x = monitor_position.x;
     let y = monitor_position.y;
+    let _ = window.set_position(PhysicalPosition::new(x, y));
 
     #[cfg(windows)]
     {
@@ -1211,18 +2052,36 @@ fn start_cursor_hit_test(window: tauri::WebviewWindow) {
         fn GetCursorPos(lpPoint: *mut POINT) -> i32;
         fn ScreenToClient(hWnd: *mut std::ffi::c_void, lpPoint: *mut POINT) -> i32;
         fn GetAsyncKeyState(vKey: i32) -> i16;
+        fn GetWindowLongW(hWnd: isize, nIndex: i32) -> i32;
+        fn SetWindowLongW(hWnd: isize, nIndex: i32, dwNewLong: i32) -> i32;
     }
+    const GWL_EXSTYLE: i32 = -20;
+    const WS_EX_TRANSPARENT: i32 = 0x00000020;
+    const WS_EX_LAYERED: i32 = 0x00080000;
 
     thread::spawn(move || {
         let hwnd_raw = match window.hwnd() {
             Ok(h) => h.0 as *mut std::ffi::c_void,
             Err(_) => return,
         };
+        let hwnd_isize = hwnd_raw as isize;
 
         let mut currently_ignoring = false;
 
         loop {
             thread::sleep(Duration::from_millis(25));
+
+            if IS_MODAL_OPEN.load(Ordering::Relaxed) {
+                if !currently_ignoring {
+                    currently_ignoring = true;
+                    unsafe {
+                        let ex = GetWindowLongW(hwnd_isize, GWL_EXSTYLE);
+                        SetWindowLongW(hwnd_isize, GWL_EXSTYLE, ex | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+                    }
+                    let _ = window.set_ignore_cursor_events(true);
+                }
+                continue;
+            }
 
             // Check global keyboard shortcut to toggle visibility
             let vk = GLOBAL_HOTKEY_VK.load(Ordering::Relaxed) as i32;
@@ -1257,16 +2116,14 @@ fn start_cursor_hit_test(window: tauri::WebviewWindow) {
             let expanded = IS_EXPANDED.load(Ordering::Relaxed);
             let with_lyrics = WITH_LYRICS.load(Ordering::Relaxed);
             let with_mini = WITH_MINI_LYRICS.load(Ordering::Relaxed);
+            let settings_open = IS_SETTINGS_OPEN.load(Ordering::Relaxed);
 
             let (target_w, target_h) = if expanded {
-                if with_lyrics { (660.0, 222.0) } else { (480.0, 222.0) }
+                if with_lyrics { (660.0, 234.0) } else { (480.0, 234.0) }
             } else {
-                if with_mini {
-                    let w = MINI_WIDTH.load(Ordering::Relaxed) as f64;
-                    (w, 35.0)
-                } else {
-                    (210.0, 35.0)
-                }
+                let w = MINI_WIDTH.load(Ordering::Relaxed) as f64;
+                let pill_w = if with_mini { w.max(210.0) } else { w.max(210.0) };
+                (pill_w, 46.0)
             };
 
             let offset_x = ISLAND_OFFSET_X.load(Ordering::Relaxed) as f64;
@@ -1280,14 +2137,40 @@ fn start_cursor_hit_test(window: tauri::WebviewWindow) {
                 && cy >= 0.0
                 && cy <= (target_h + margin);
 
-            if on_island {
+            let on_settings = if settings_open {
+                let s_off_x = SETTINGS_OFFSET_X.load(Ordering::Relaxed) as f64;
+                let s_off_y = SETTINGS_OFFSET_Y.load(Ordering::Relaxed) as f64;
+                let s_w = 590.0;
+                let s_h = 410.0;
+                let s_center_x = (win_w_logical / 2.0) + s_off_x;
+                let s_left = s_center_x - (s_w / 2.0);
+                let s_right = s_center_x + (s_w / 2.0);
+                let s_top = s_off_y;
+                let s_bottom = s_top + s_h;
+                cx >= (s_left - margin)
+                    && cx <= (s_right + margin)
+                    && cy >= (s_top - margin)
+                    && cy <= (s_bottom + margin)
+            } else {
+                false
+            };
+
+            if on_island || on_settings {
                 if currently_ignoring {
                     currently_ignoring = false;
+                    unsafe {
+                        let ex = GetWindowLongW(hwnd_isize, GWL_EXSTYLE);
+                        SetWindowLongW(hwnd_isize, GWL_EXSTYLE, ex & !WS_EX_TRANSPARENT);
+                    }
                     let _ = window.set_ignore_cursor_events(false);
                 }
             } else {
                 if !currently_ignoring {
                     currently_ignoring = true;
+                    unsafe {
+                        let ex = GetWindowLongW(hwnd_isize, GWL_EXSTYLE);
+                        SetWindowLongW(hwnd_isize, GWL_EXSTYLE, ex | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+                    }
                     let _ = window.set_ignore_cursor_events(true);
                 }
             }
@@ -1359,15 +2242,15 @@ fn switch_monitor(app: AppHandle) -> Result<String, String> {
 
     let monitor_size = target_monitor.size();
     let monitor_position = target_monitor.position();
-    let scale = window.scale_factor().unwrap_or(1.0);
 
     let full_w_phys = monitor_size.width;
-    let h_phys = (260.0 * scale).round() as u32;
+    let h_phys = monitor_size.height.saturating_sub(2);
 
     let _ = window.set_size(PhysicalSize::new(full_w_phys, h_phys));
 
     let x = monitor_position.x;
     let y = monitor_position.y;
+    let _ = window.set_position(PhysicalPosition::new(x, y));
     ISLAND_OFFSET_X.store(0, Ordering::Relaxed);
 
     #[cfg(windows)]
@@ -1423,8 +2306,12 @@ pub fn run() {
             open_spotify,
             get_volume,
             set_volume,
+            get_battery_status,
             open_file_path,
             get_file_icon,
+            get_file_info,
+            pick_files_dialog,
+            pick_native_color,
             set_autostart,
             get_autostart,
             switch_monitor,
@@ -1508,13 +2395,8 @@ pub fn run() {
                     .build(app)?;
             }
 
-            // Enable Windows autostart on boot by default in release builds
-            #[cfg(not(debug_assertions))]
+            // Enable Windows autostart on boot by default
             let _ = set_autostart(true);
-
-            // In debug mode, ensure any dev binary is NOT in Windows autostart
-            #[cfg(debug_assertions)]
-            let _ = set_autostart(false);
 
             println!("[Baobao] Setup complete!");
             Ok(())
